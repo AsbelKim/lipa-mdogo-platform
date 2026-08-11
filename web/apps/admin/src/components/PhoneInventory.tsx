@@ -253,12 +253,10 @@ export default function PhoneInventory() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredPhones.map((phone) => (
-                <tr key={phone.id} className="hover:bg-gray-50 cursor-pointer transition">
-                  <td
-                    onClick={() => openModelDetail(phone)}
-                    className="px-6 py-4 text-sm font-medium text-primary hover:underline"
-                  >
-                    {phone.model}</td>
+                <tr key={phone.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    {phone.model}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{phone.specs}</td>
                   <td className="px-6 py-4 text-sm text-right text-gray-900">
                     <span className="font-semibold">{formatCurrency(phone.downPayment)}</span>
@@ -297,7 +295,7 @@ export default function PhoneInventory() {
                   </td>
                   <td className="px-6 py-4 text-right text-sm space-x-2">
                     <button
-                      onClick={() => setSelectedPhone(phone)}
+                      onClick={() => openModelDetail(phone)}
                       className="text-primary hover:underline font-medium"
                     >
                       View
