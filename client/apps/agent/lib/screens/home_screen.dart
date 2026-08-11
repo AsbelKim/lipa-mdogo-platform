@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/core.dart';
 import 'login_screen.dart';
+import 'devices_screen.dart';
+import 'customers_screen.dart';
+import 'sales_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,8 +19,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final List<BottomNavigationBarItem> _navItems = const [
     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
     BottomNavigationBarItem(icon: Icon(Icons.phone_android), label: 'Devices'),
-    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Customers'),
-    BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Profile'),
+    BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Sales'),
+    BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Customers'),
   ];
 
   @override
@@ -54,11 +57,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       case 0:
         return _buildDashboard();
       case 1:
-        return _buildDevices();
+        return const DevicesScreen();
       case 2:
-        return _buildCustomers();
+        return const SalesScreen();
       case 3:
-        return _buildProfile();
+        return const CustomersScreen();
       default:
         return _buildDashboard();
     }
@@ -73,64 +76,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             Text('Welcome Agent!', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 24),
-            _buildStatCard('Total Devices', '0', Colors.blue),
+            _buildStatCard('Assigned Devices', '—', Colors.blue),
             const SizedBox(height: 12),
-            _buildStatCard('Active Sales', '0', Colors.green),
+            _buildStatCard('Active Sales', '—', Colors.green),
             const SizedBox(height: 12),
-            _buildStatCard('Total Revenue', 'KES 0', Colors.orange),
+            _buildStatCard('Payments Today', 'KES 0', Colors.orange),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.add),
-              label: const Text('New Sale'),
+            Text('Quick Actions', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ActionChip(
+                  icon: const Icon(Icons.person_add),
+                  label: const Text('Add Customer'),
+                  onPressed: () => setState(() => _selectedIndex = 3),
+                ),
+                ActionChip(
+                  icon: const Icon(Icons.add_shopping_cart),
+                  label: const Text('New Sale'),
+                  onPressed: () => setState(() => _selectedIndex = 2),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDevices() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.phone_android, size: 64),
-          const SizedBox(height: 16),
-          Text('My Devices', style: Theme.of(context).textTheme.headlineSmall),
-          const SizedBox(height: 8),
-          const Text('Devices assigned to you'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCustomers() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.people, size: 64),
-          const SizedBox(height: 16),
-          Text('My Customers', style: Theme.of(context).textTheme.headlineSmall),
-          const SizedBox(height: 8),
-          const Text('Customers and sales'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfile() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.person, size: 64),
-          const SizedBox(height: 16),
-          Text('My Profile', style: Theme.of(context).textTheme.headlineSmall),
-          const SizedBox(height: 8),
-          const Text('Agent information and settings'),
-        ],
       ),
     );
   }
