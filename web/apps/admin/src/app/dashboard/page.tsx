@@ -6,6 +6,8 @@ import Sidebar from '../../components/Sidebar';
 import TopBar from '../../components/TopBar';
 import DashboardContent from '../../components/Dashboard';
 import PhoneInventory from '../../components/PhoneInventory';
+import AgentAllocationManager from '../../components/AgentAllocationManager';
+import AgentInventoryDetail from '../../components/AgentInventoryDetail';
 import DevicesList from '../../components/DevicesList';
 import CustomersList from '../../components/CustomersList';
 import SalesList from '../../components/SalesList';
@@ -44,6 +46,8 @@ export default function DashboardPage() {
           <div className="p-8">
             {activeTab === 'dashboard' && <DashboardContent />}
             {activeTab === 'phones' && <PhoneInventory />}
+            {activeTab === 'agents' && <AgentAllocationManager />}
+            {activeTab === 'agent-inventory' && <AgentInventoryDetail />}
             {activeTab === 'devices' && <DevicesList />}
             {activeTab === 'customers' && <CustomersList />}
             {activeTab === 'sales' && <SalesList />}

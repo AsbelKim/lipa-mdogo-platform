@@ -7,8 +7,10 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'phones', label: 'Phone Inventory', icon: '📱' },
+    { id: 'agents', label: 'Agent Allocation', icon: '👥' },
+    { id: 'agent-inventory', label: 'Agent Stock View', icon: '📋' },
     { id: 'devices', label: 'Device Assignments', icon: '🔗' },
-    { id: 'customers', label: 'Customers', icon: '👥' },
+    { id: 'customers', label: 'Customers', icon: '💼' },
     { id: 'sales', label: 'Sales', icon: '💰' },
   ];
 
