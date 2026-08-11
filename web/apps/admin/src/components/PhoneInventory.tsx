@@ -2,12 +2,53 @@
 
 import { useState } from 'react';
 import { Phone, PHONE_CATALOG } from '../types/phones';
+import IndividualPhoneList from './IndividualPhoneList';
+
+interface IndividualPhone {
+  id: string;
+  model: string;
+  imei: string;
+  serialNumber: string;
+  status: 'in-stock' | 'allocated' | 'sold' | 'damaged' | 'lost';
+  dateAdded: string;
+  condition: 'new' | 'refurbished' | 'used';
+}
 
 export default function PhoneInventory() {
   const [phones] = useState<Phone[]>(PHONE_CATALOG);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPhone, setSelectedPhone] = useState<Phone | null>(null);
+  const [viewMode, setViewMode] = useState<'models' | 'individual'>('models');
+  const [individualPhones, setIndividualPhones] = useState<IndividualPhone[]>([
+    {
+      id: 'phone-1',
+      model: 'Samsung Galaxy A56 5G',
+      imei: '359072080276522',
+      serialNumber: 'RF9DL1A20GU',
+      status: 'in-stock',
+      dateAdded: new Date().toISOString(),
+      condition: 'new',
+    },
+    {
+      id: 'phone-2',
+      model: 'Samsung Galaxy A56 5G',
+      imei: '359072080276523',
+      serialNumber: 'RF9DL1A20GV',
+      status: 'in-stock',
+      dateAdded: new Date().toISOString(),
+      condition: 'new',
+    },
+    {
+      id: 'phone-3',
+      model: 'Samsung Galaxy A36 5G',
+      imei: '359072080276524',
+      serialNumber: 'RF9DL1A20GW',
+      status: 'allocated',
+      dateAdded: new Date().toISOString(),
+      condition: 'refurbished',
+    },
+  ]);
 
   const filteredPhones = phones.filter((phone) => {
     const categoryMatch = selectedCategory === 'all' || phone.category === selectedCategory;
@@ -34,14 +75,49 @@ export default function PhoneInventory() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">📱 Phone Inventory</h1>
-          <p className="text-gray-600 mt-1">Manage available phones and pricing</p>
+          <p className="text-gray-600 mt-1">
+            {viewMode === 'models' ? 'Manage phone models and pricing' : 'Track individual phones with IMEI numbers'}
+          </p>
         </div>
-        <button className="px-4 py-2 bg-primary hover:bg-emerald-700 text-white rounded-lg transition">
-          + Add Phone Model
+        <button className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition">
+          + {viewMode === 'models' ? 'Add Phone Model' : 'Add Phone'}
         </button>
       </div>
 
+      {/* View Tabs */}
+      <div className="flex gap-2 border-b border-gray-200">
+        <button
+          onClick={() => setViewMode('models')}
+          className={`px-4 py-3 font-medium border-b-2 transition ${
+            viewMode === 'models'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          📊 Phone Models ({phones.length})
+        </button>
+        <button
+          onClick={() => setViewMode('individual')}
+          className={`px-4 py-3 font-medium border-b-2 transition ${
+            viewMode === 'individual'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          📱 Individual Phones ({individualPhones.length})
+        </button>
+      </div>
+
+      {viewMode === 'individual' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-900">
+            💡 <strong>IMEI Tracking:</strong> Each phone has a unique 15-digit IMEI number for identification and tracking. Serial numbers help identify specific devices for warranty and support.
+          </p>
+        </div>
+      )}
+
       {/* Quick Stats */}
+      {viewMode === 'models' && (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-blue-50 rounded-lg p-4">
           <p className="text-sm text-gray-600">Total Stock</p>
@@ -69,7 +145,10 @@ export default function PhoneInventory() {
           <p className="text-xs text-gray-500 mt-1">estimated</p>
         </div>
       </div>
+      )}
 
+      {viewMode === 'models' && (
+      <>
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-4 flex gap-4 items-center flex-wrap">
         <div className="flex-1 min-w-64">
@@ -254,6 +333,19 @@ export default function PhoneInventory() {
       {filteredPhones.length === 0 && (
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <p className="text-gray-600 text-lg">No phones found matching your filters</p>
+        </div>
+      )}
+      </>
+      )}
+
+      {viewMode === 'individual' && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <IndividualPhoneList
+            phones={individualPhones}
+            onDelete={(phoneId) => {
+              setIndividualPhones(individualPhones.filter(p => p.id !== phoneId));
+            }}
+          />
         </div>
       )}
     </div>

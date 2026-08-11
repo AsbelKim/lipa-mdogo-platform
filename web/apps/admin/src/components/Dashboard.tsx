@@ -31,8 +31,8 @@ export default function Dashboard() {
     setModals({ ...modals, [modalName]: false });
   };
 
-  const handleAddDevice = (device: any) => {
-    setStats({ ...stats, devices: stats.devices + device.quantity });
+  const handleAddDevice = () => {
+    setStats({ ...stats, devices: stats.devices + 1 });
   };
 
   const handleAddCustomer = () => {
