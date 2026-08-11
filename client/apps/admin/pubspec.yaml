@@ -1,0 +1,43 @@
+name: lipa_admin
+description: Admin dashboard for Lipa Mdogo platform (Watu Credit)
+publish_to: none
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+  flutter: ^3.24.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Shared core
+  core:
+    path: ../../packages/core
+
+  # UI & Navigation
+  get: ^4.6.0
+  flutter_adaptive_scaffold: ^0.2.0
+
+  # State management
+  riverpod: ^2.4.0
+  flutter_riverpod: ^2.4.0
+
+  # Utilities
+  intl: ^0.19.0
+  shared_preferences: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
