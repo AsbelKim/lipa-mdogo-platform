@@ -7,7 +7,8 @@
 ```
 lipa-mdogo-platform/
 ├── backend/          Laravel REST API (PostgreSQL)
-├── client/           Flutter (admin dashboard + sales agent app)
+├── web/              Next.js web apps (admin + agent)
+├── client/           Flutter (mobile - Phase 2+)
 ├── device-agent/     Native Android tracking agent (Phase 3+)
 └── docs/
 ```
@@ -55,6 +56,26 @@ php artisan serve
 
 See [backend/SETUP.md](backend/SETUP.md) for full details and API endpoints.
 
+### Web Platform (NEW)
+
+```bash
+cd web
+
+# 1. Install dependencies
+npm install
+
+# 2. Set up environment
+cp apps/admin/.env.local.example apps/admin/.env.local
+cp apps/agent/.env.local.example apps/agent/.env.local
+
+# 3. Start development servers
+npm run dev
+# Admin: http://localhost:3000
+# Agent: http://localhost:3001
+```
+
+See [web/README.md](web/README.md) for full details on web development.
+
 ### Watu Credit Test Credentials
 
 - **Admin:** `admin@watucredit.co.ke` / `password`
@@ -70,13 +91,14 @@ See [backend/SETUP.md](backend/SETUP.md) for full details and API endpoints.
 
 ## Next Steps
 
-1. **Migrate + test** backend API (local PostgreSQL)
-2. **Scaffold Flutter client** — monorepo with admin/agent flavors
-3. **Build agent mobile UI** — device list, customer onboarding, payment entry
-4. **Build admin dashboard UI** — inventory, sales, payment overview
-5. **End-to-end test** — flutter ↔ API ↔ database
-6. **Phase 2** — Alerts, overdue detection, agent KPIs
-7. **Phase 3** — Android device tracking agent
+1. ✅ **Backend API** — Phase 1 complete
+2. ✅ **Web platform scaffolding** — Next.js admin & agent apps with shared core
+3. **Web development** — Build UI for device management, sales, payments
+4. **Backend testing** — Integration tests, edge cases
+5. **Web testing** — E2E tests (Playwright/Cypress)
+6. **Phase 2** — Alerts, overdue detection, agent KPIs, analytics
+7. **Flutter client** — Mirror web features for mobile (Phase 2+)
+8. **Phase 3** — Android device tracking agent
 
 ## Compliance & Security
 
