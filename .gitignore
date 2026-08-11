@@ -1,0 +1,38 @@
+# Laravel
+backend/node_modules
+backend/vendor
+backend/.env
+backend/.env.local
+backend/.env.*.php
+backend/storage
+backend/bootstrap/cache
+backend/Homestead.json
+backend/Homestead.yaml
+backend/.phpunit.result.cache
+
+# Flutter
+client/build
+client/packages/core/.dart_tool
+client/packages/core/build
+client/apps/*/build
+client/apps/*/.dart_tool
+client/apps/*/.env
+client/**/pubspec.lock
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.env
+.env.local
+
+# Misc
+*.log
