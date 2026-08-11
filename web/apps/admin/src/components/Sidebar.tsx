@@ -1,19 +1,34 @@
 import WatuLogo from './WatuLogo';
+import {
+  DashboardIcon,
+  PhoneIcon,
+  UsersIcon,
+  ShoppingIcon,
+  ShieldIcon,
+  WalletIcon,
+  TrendingIcon,
+} from './Icons';
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
 
+interface NavTab {
+  id: string;
+  label: string;
+  icon: React.FC;
+}
+
 export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'phones', label: 'Phone Inventory', icon: '📱' },
-    { id: 'agents', label: 'Agent Allocation', icon: '👥' },
-    { id: 'agent-inventory', label: 'Agent Stock View', icon: '📋' },
-    { id: 'devices', label: 'Device Assignments', icon: '🔗' },
-    { id: 'customers', label: 'Customers', icon: '💼' },
-    { id: 'sales', label: 'Sales', icon: '💰' },
+  const tabs: NavTab[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
+    { id: 'phones', label: 'Phone Inventory', icon: PhoneIcon },
+    { id: 'agents', label: 'Agent Allocation', icon: UsersIcon },
+    { id: 'agent-inventory', label: 'Agent Stock View', icon: ShoppingIcon },
+    { id: 'devices', label: 'Device Assignments', icon: ShieldIcon },
+    { id: 'customers', label: 'Customers', icon: WalletIcon },
+    { id: 'sales', label: 'Sales', icon: TrendingIcon },
   ];
 
   return (
@@ -26,20 +41,23 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       </div>
 
       <nav className="mt-8 space-y-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => onTabChange(tab.id)}
-            className={`w-full text-left px-6 py-3 transition font-medium ${
-              activeTab === tab.id
-                ? 'bg-secondary text-white border-l-4 border-yellow-300 shadow-md'
-                : 'text-green-100 hover:bg-primary/80 border-l-4 border-transparent'
-            }`}
-          >
-            <span className="text-lg mr-3">{tab.icon}</span>
-            {tab.label}
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const IconComponent = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={`w-full text-left px-6 py-3 transition font-medium flex items-center gap-3 ${
+                activeTab === tab.id
+                  ? 'bg-secondary text-white border-l-4 border-yellow-300 shadow-md'
+                  : 'text-green-100 hover:bg-primary/80 border-l-4 border-transparent'
+              }`}
+            >
+              <IconComponent />
+              {tab.label}
+            </button>
+          );
+        })}
       </nav>
 
       {/* Footer */}

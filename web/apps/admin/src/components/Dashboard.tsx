@@ -1,6 +1,7 @@
 'use client';
 
 import StatCard from './StatCard';
+import { PlusIcon, ShoppingIcon, CreditCardIcon, AlertIcon } from './Icons';
 
 export default function Dashboard() {
   // Mock data for now
@@ -49,17 +50,21 @@ export default function Dashboard() {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary">
-            ➕ Add Device
+          <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary flex flex-col items-center gap-2">
+            <PlusIcon />
+            Add Device
           </button>
-          <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary">
-            ➕ Add Customer
+          <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary flex flex-col items-center gap-2">
+            <AlertIcon />
+            Add Customer
           </button>
-          <button className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary">
-            ➕ Create Sale
+          <button className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary flex flex-col items-center gap-2">
+            <ShoppingIcon />
+            Create Sale
           </button>
-          <button className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary">
-            ➕ Log Payment
+          <button className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary flex flex-col items-center gap-2">
+            <CreditCardIcon />
+            Log Payment
           </button>
         </div>
       </div>
