@@ -1,36 +1,107 @@
 'use client';
 
 import { useState } from 'react';
-import { SALES_AGENTS, AGENT_INVENTORY, AgentInventorySummary } from '../types/agents';
-import { PHONE_CATALOG } from '../types/phones';
+import { SALES_AGENTS } from '../types/agents';
+import Modal from './Modal';
+
+interface IndividualPhoneAllocation {
+  id: string;
+  agentId: string;
+  phoneId: string;
+  model: string;
+  imei: string;
+  serialNumber: string;
+  condition: 'new' | 'refurbished' | 'used';
+  status: 'in-stock' | 'sold' | 'damaged' | 'lost';
+  dateAllocated: string;
+  dateSold?: string;
+  customerName?: string;
+}
 
 export default function AgentAllocationManager() {
   const [agents] = useState(SALES_AGENTS);
-  const [inventory] = useState(AGENT_INVENTORY);
   const [showAllocationForm, setShowAllocationForm] = useState(false);
+  const [selectedAgentView, setSelectedAgentView] = useState<string | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<string>('');
-  const [selectedPhoneModel, setSelectedPhoneModel] = useState<string>('');
-  const [allocationQty, setAllocationQty] = useState('');
-  const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
+  const [selectedPhoneImei, setSelectedPhoneImei] = useState<string>('');
 
-  const getAgentInventorySummary = (agentId: string): AgentInventorySummary => {
-    const agentInv = inventory.filter((item) => item.agentId === agentId);
-    const agent = agents.find((a) => a.id === agentId);
+  // Sample allocated phones data
+  const [allocatedPhones, setAllocatedPhones] = useState<IndividualPhoneAllocation[]>([
+    {
+      id: 'alloc-1',
+      agentId: 'agent-1',
+      phoneId: 'phone-1',
+      model: 'Samsung Galaxy A56 5G',
+      imei: '359072080276522',
+      serialNumber: 'RF9DL1A20GU',
+      condition: 'new',
+      status: 'in-stock',
+      dateAllocated: new Date().toISOString(),
+    },
+    {
+      id: 'alloc-2',
+      agentId: 'agent-1',
+      phoneId: 'phone-2',
+      model: 'Samsung Galaxy A56 5G',
+      imei: '359072080276523',
+      serialNumber: 'RF9DL1A20GV',
+      condition: 'new',
+      status: 'sold',
+      dateAllocated: new Date().toISOString(),
+      dateSold: new Date().toISOString(),
+      customerName: 'John Doe',
+    },
+    {
+      id: 'alloc-3',
+      agentId: 'agent-2',
+      phoneId: 'phone-3',
+      model: 'Samsung Galaxy A36 5G',
+      imei: '359072080276524',
+      serialNumber: 'RF9DL1A20GW',
+      condition: 'refurbished',
+      status: 'in-stock',
+      dateAllocated: new Date().toISOString(),
+    },
+  ]);
 
-    const totalAllocated = agentInv.length;
-    const totalSold = agentInv.filter((item) => item.status === 'sold').length;
-    const totalUnsold = agentInv.filter((item) => item.status === 'in-stock').length;
+  // Available phones for allocation (in-stock phones not yet allocated)
+  const availablePhones: IndividualPhoneAllocation[] = [
+    {
+      id: 'phone-4',
+      agentId: '',
+      phoneId: 'phone-4',
+      model: 'Samsung Galaxy A05',
+      imei: '359072080276525',
+      serialNumber: 'RF9DL1A20GX',
+      condition: 'new',
+      status: 'in-stock',
+      dateAllocated: '',
+    },
+    {
+      id: 'phone-5',
+      agentId: '',
+      phoneId: 'phone-5',
+      model: 'Samsung Galaxy A06',
+      imei: '359072080276526',
+      serialNumber: 'RF9DL1A20GY',
+      condition: 'refurbished',
+      status: 'in-stock',
+      dateAllocated: '',
+    },
+  ];
+
+  const getAgentPhones = (agentId: string) => {
+    return allocatedPhones.filter((p) => p.agentId === agentId);
+  };
+
+  const getAgentStats = (agentId: string) => {
+    const phones = getAgentPhones(agentId);
+    const totalAllocated = phones.length;
+    const totalSold = phones.filter((p) => p.status === 'sold').length;
+    const totalUnsold = phones.filter((p) => p.status === 'in-stock').length;
     const conversionRate = totalAllocated > 0 ? Math.round((totalSold / totalAllocated) * 100) : 0;
 
-    return {
-      agentId,
-      agentName: agent?.name || '',
-      totalAllocated,
-      totalSold,
-      totalUnsold,
-      totalRevenue: agent?.totalRevenue || 0,
-      conversionRate,
-    };
+    return { totalAllocated, totalSold, totalUnsold, conversionRate };
   };
 
   const formatCurrency = (amount: number) => {
@@ -43,18 +114,25 @@ export default function AgentAllocationManager() {
 
   const handleAllocate = (e: React.FormEvent) => {
     e.preventDefault();
-    // In real app, this would call backend API
-    console.log('Allocating:', {
-      agentId: selectedAgent,
-      phoneModelId: selectedPhoneModel,
-      quantity: allocationQty,
-    });
-    // Reset form
-    setSelectedAgent('');
-    setSelectedPhoneModel('');
-    setAllocationQty('');
-    setShowAllocationForm(false);
-    alert('✅ Phones allocated successfully!');
+
+    if (!selectedAgent || !selectedPhoneImei) {
+      alert('Please select agent and phone');
+      return;
+    }
+
+    const phoneToAllocate = availablePhones.find((p) => p.imei === selectedPhoneImei);
+    if (phoneToAllocate) {
+      const newAllocation: IndividualPhoneAllocation = {
+        ...phoneToAllocate,
+        agentId: selectedAgent,
+        dateAllocated: new Date().toISOString(),
+      };
+      setAllocatedPhones([...allocatedPhones, newAllocation]);
+      setSelectedAgent('');
+      setSelectedPhoneImei('');
+      setShowAllocationForm(false);
+      alert('✅ Phone allocated successfully!');
+    }
   };
 
   return (
@@ -74,93 +152,84 @@ export default function AgentAllocationManager() {
       </div>
 
       {/* Allocation Form Modal */}
-      {showAllocationForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Allocate Phones to Agent</h2>
-
-            <form onSubmit={handleAllocate} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Sales Agent</label>
-                <select
-                  value={selectedAgent}
-                  onChange={(e) => setSelectedAgent(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                >
-                  <option value="">Select an agent...</option>
-                  {agents.map((agent) => (
-                    <option key={agent.id} value={agent.id}>
-                      {agent.name} ({agent.location})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Model</label>
-                <select
-                  value={selectedPhoneModel}
-                  onChange={(e) => setSelectedPhoneModel(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                >
-                  <option value="">Select a phone model...</option>
-                  {PHONE_CATALOG.map((phone) => (
-                    <option key={phone.id} value={phone.id}>
-                      {phone.model} ({phone.specs}) - {phone.stockQuantity} available
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="10"
-                  value={allocationQty}
-                  onChange={(e) => setAllocationQty(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Number of phones to allocate"
-                  required
-                />
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-                ℹ️ These phones will be deducted from general stock and assigned to the agent.
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-primary hover:bg-emerald-700 text-white rounded-lg transition font-medium"
-                >
-                  Allocate
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowAllocationForm(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg transition font-medium"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+      <Modal isOpen={showAllocationForm} onClose={() => setShowAllocationForm(false)} title="Allocate Phone to Agent">
+        <form onSubmit={handleAllocate} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Sales Agent *</label>
+            <select
+              value={selectedAgent}
+              onChange={(e) => setSelectedAgent(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              required
+            >
+              <option value="">Select an agent...</option>
+              {agents.map((agent) => (
+                <option key={agent.id} value={agent.id}>
+                  {agent.name} ({agent.location})
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-      )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Available Phone (IMEI) *</label>
+            <select
+              value={selectedPhoneImei}
+              onChange={(e) => setSelectedPhoneImei(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              required
+            >
+              <option value="">Select a phone...</option>
+              {availablePhones.map((phone) => (
+                <option key={phone.imei} value={phone.imei}>
+                  {phone.model} - IMEI: {phone.imei}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedPhoneImei && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+              <p className="font-medium">Phone Details:</p>
+              {availablePhones.find((p) => p.imei === selectedPhoneImei) && (
+                <>
+                  <p>Model: {availablePhones.find((p) => p.imei === selectedPhoneImei)?.model}</p>
+                  <p>Serial: {availablePhones.find((p) => p.imei === selectedPhoneImei)?.serialNumber}</p>
+                  <p>Condition: {availablePhones.find((p) => p.imei === selectedPhoneImei)?.condition}</p>
+                </>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setShowAllocationForm(false)}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium"
+            >
+              Allocate Phone
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Agents Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {agents.map((agent) => {
-          const summary = getAgentInventorySummary(agent.id);
+          const agentPhones = getAgentPhones(agent.id);
+          const stats = getAgentStats(agent.id);
+
           return (
             <div
               key={agent.id}
               className="bg-white rounded-lg shadow border border-gray-200 hover:shadow-lg transition cursor-pointer"
-              onClick={() => setExpandedAgent(expandedAgent === agent.id ? null : agent.id)}
+              onClick={() => setSelectedAgentView(selectedAgentView === agent.id ? null : agent.id)}
             >
               <div className="p-4">
                 <div className="flex justify-between items-start mb-3">
@@ -175,23 +244,23 @@ export default function AgentAllocationManager() {
 
                 <div className="grid grid-cols-3 gap-3 mb-3 text-center">
                   <div className="bg-blue-50 rounded p-2">
-                    <p className="text-lg font-bold text-blue-600">{summary.totalAllocated}</p>
+                    <p className="text-lg font-bold text-blue-600">{stats.totalAllocated}</p>
                     <p className="text-xs text-gray-600">Allocated</p>
                   </div>
                   <div className="bg-green-50 rounded p-2">
-                    <p className="text-lg font-bold text-green-600">{summary.totalSold}</p>
+                    <p className="text-lg font-bold text-green-600">{stats.totalSold}</p>
                     <p className="text-xs text-gray-600">Sold</p>
                   </div>
                   <div className="bg-amber-50 rounded p-2">
-                    <p className="text-lg font-bold text-amber-600">{summary.totalUnsold}</p>
-                    <p className="text-xs text-gray-600">Unsold</p>
+                    <p className="text-lg font-bold text-amber-600">{stats.totalUnsold}</p>
+                    <p className="text-xs text-gray-600">In Stock</p>
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm text-gray-600">Conversion Rate</p>
-                    <p className="text-xl font-bold text-primary">{summary.conversionRate}%</p>
+                    <p className="text-xl font-bold text-primary">{stats.conversionRate}%</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Revenue</p>
@@ -199,30 +268,45 @@ export default function AgentAllocationManager() {
                   </div>
                 </div>
 
-                {expandedAgent === agent.id && (
+                {selectedAgentView === agent.id && agentPhones.length > 0 && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-3">Detailed Inventory</h4>
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {inventory
-                        .filter((item) => item.agentId === agent.id)
-                        .map((item) => (
-                          <div key={item.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">{item.phoneModel}</p>
-                              <p className="text-xs text-gray-600">{item.phoneModel}</p>
+                    <h4 className="font-semibold text-gray-900 mb-3">Allocated Phones</h4>
+                    <div className="space-y-2 max-h-80 overflow-y-auto">
+                      {agentPhones.map((phone) => (
+                        <div key={phone.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-900">{phone.model}</p>
+                              <p className="text-xs text-gray-600 font-mono">IMEI: {phone.imei}</p>
+                              <p className="text-xs text-gray-600">Serial: {phone.serialNumber}</p>
                             </div>
                             <span
-                              className={`px-2 py-1 rounded text-xs font-medium ${
-                                item.status === 'sold'
+                              className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ml-2 ${
+                                phone.status === 'sold'
                                   ? 'bg-green-100 text-green-800'
-                                  : 'bg-amber-100 text-amber-800'
+                                  : phone.status === 'in-stock'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-red-100 text-red-800'
                               }`}
                             >
-                              {item.status === 'sold' ? '✓ Sold' : '📱 In Stock'}
+                              {phone.status === 'sold' ? '✓ Sold' : phone.status === 'in-stock' ? '📱 In Stock' : 'Damaged'}
                             </span>
                           </div>
-                        ))}
+                          <div className="flex gap-2 text-xs text-gray-500">
+                            <span>Condition: <strong>{phone.condition}</strong></span>
+                            {phone.status === 'sold' && phone.customerName && (
+                              <span>Customer: <strong>{phone.customerName}</strong></span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
+                  </div>
+                )}
+
+                {selectedAgentView === agent.id && agentPhones.length === 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 text-center text-gray-600 text-sm">
+                    No phones allocated to this agent
                   </div>
                 )}
               </div>
@@ -232,7 +316,7 @@ export default function AgentAllocationManager() {
       </div>
 
       {/* Summary Stats */}
-      <div className="bg-gradient-to-r from-primary to-emerald-600 rounded-lg shadow text-white p-6">
+      <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg shadow text-white p-6">
         <h3 className="text-lg font-bold mb-4">Overall Team Performance</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
@@ -241,14 +325,12 @@ export default function AgentAllocationManager() {
           </div>
           <div>
             <p className="text-sm opacity-90">Total Allocated</p>
-            <p className="text-3xl font-bold">
-              {inventory.length}
-            </p>
+            <p className="text-3xl font-bold">{allocatedPhones.length}</p>
           </div>
           <div>
             <p className="text-sm opacity-90">Total Sold</p>
             <p className="text-3xl font-bold">
-              {inventory.filter((i) => i.status === 'sold').length}
+              {allocatedPhones.filter((p) => p.status === 'sold').length}
             </p>
           </div>
           <div>
