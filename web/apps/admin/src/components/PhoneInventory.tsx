@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Phone, PHONE_CATALOG } from '../types/phones';
 import IndividualPhoneList from './IndividualPhoneList';
 import PhoneModelDetail from './PhoneModelDetail';
+import BulkUploadModal from './BulkUploadModal';
 
 interface IndividualPhone {
   id: string;
@@ -37,6 +38,7 @@ export default function PhoneInventory() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedModelUnits, setSelectedModelUnits] = useState<PhoneUnit[]>([]);
   const [selectedModelName, setSelectedModelName] = useState('');
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
 
   // Generate sample phone units for a model
   const generatePhoneUnits = (model: Phone): PhoneUnit[] => {
@@ -77,6 +79,21 @@ export default function PhoneInventory() {
     setSelectedModelUnits(generatePhoneUnits(phone));
     setDetailModalOpen(true);
   };
+
+  const handleBulkUpload = (uploadedPhones: Array<{ model: string; imei: string; serialNumber: string; condition: string }>) => {
+    const newPhones: IndividualPhone[] = uploadedPhones.map((phone, index) => ({
+      id: `phone-${Date.now()}-${index}`,
+      model: phone.model,
+      imei: phone.imei,
+      serialNumber: phone.serialNumber,
+      status: 'in-stock' as const,
+      dateAdded: new Date().toISOString(),
+      condition: phone.condition as 'new' | 'refurbished' | 'used',
+    }));
+    setIndividualPhones(prev => [...prev, ...newPhones]);
+    setBulkUploadOpen(false);
+  };
+
   const [individualPhones, setIndividualPhones] = useState<IndividualPhone[]>([
     {
       id: 'phone-1',
@@ -166,11 +183,22 @@ export default function PhoneInventory() {
       </div>
 
       {viewMode === 'individual' && (
+        <>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-blue-900">
             💡 <strong>IMEI Tracking:</strong> Each phone has a unique 15-digit IMEI number for identification and tracking. Serial numbers help identify specific devices for warranty and support.
           </p>
         </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => setBulkUploadOpen(true)}
+            className="px-4 py-2 bg-secondary hover:bg-orange-600 text-white rounded-lg transition font-medium"
+          >
+            📤 Bulk Upload CSV
+          </button>
+        </div>
+        </>
       )}
 
       {/* Quick Stats */}
@@ -414,6 +442,13 @@ export default function PhoneInventory() {
         onClose={() => setDetailModalOpen(false)}
         modelName={selectedModelName}
         units={selectedModelUnits}
+      />
+
+      {/* Bulk Upload Modal */}
+      <BulkUploadModal
+        isOpen={bulkUploadOpen}
+        onClose={() => setBulkUploadOpen(false)}
+        onUpload={handleBulkUpload}
       />
     </div>
   );
