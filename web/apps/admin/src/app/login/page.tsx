@@ -2,11 +2,7 @@
 
 import { useState } from 'react';
 
-interface LoginPageProps {
-  onLoginSuccess?: (user: any) => void;
-}
-
-export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
+export default function LoginPage() {
   const [email, setEmail] = useState('admin@watucredit.co.ke');
   const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);

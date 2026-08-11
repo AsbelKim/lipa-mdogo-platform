@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { apiClient } from '../api/client';
-import { User, AuthResponse } from '../types';
+import { User } from '../types';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);

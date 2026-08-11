@@ -1,5 +1,4 @@
 import { User } from '@lipa/core';
-import WatuLogo from './WatuLogo';
 
 interface TopBarProps {
   user: User;
