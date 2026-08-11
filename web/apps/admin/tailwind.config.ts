@@ -7,11 +7,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#1B5E20', // Watu Deep Green
-        secondary: '#FF6F00', // Watu Orange
-        'watu-blue': '#003DA5', // Deep Professional Blue
-        'watu-light': '#F5F5F5', // Light background
-        'watu-success': '#4CAF50', // Success green
+        primary: '#16A39E', // Watu Teal
+        secondary: '#FF6B35', // Watu Orange
+        'watu-light': '#A8D8D8', // Light Teal background
+        'watu-dark': '#1F1F1F', // Dark Text
+        'watu-bg': '#F0F8F7', // Very light teal background
+        'watu-border': '#16A39E', // Teal borders
       },
     },
   },

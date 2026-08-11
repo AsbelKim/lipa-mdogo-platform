@@ -26,14 +26,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-secondary flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md border-t-4 border-secondary">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <WatuLogo size="lg" />
+            <div className="bg-primary rounded-xl p-3">
+              <svg viewBox="0 0 60 60" className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="8" y="8" width="44" height="44" rx="8"/>
+                <circle cx="30" cy="30" r="16"/>
+                <path d="M30 22v16M22 30h16"/>
+              </svg>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin Portal</h1>
-          <p className="text-gray-600 mt-1 text-sm">Asset Financing Management</p>
+          <h1 className="text-3xl font-bold text-primary">watu</h1>
+          <p className="text-gray-600 mt-1 text-sm">Admin Portal</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -74,7 +80,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-lg text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>

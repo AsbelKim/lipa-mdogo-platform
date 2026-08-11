@@ -32,12 +32,12 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-64 bg-gradient-to-b from-primary to-primary/90 text-white shadow-lg">
-      <div className="p-6 border-b border-primary/30">
+    <aside className="w-64 bg-gradient-to-b from-watu-dark to-watu-dark/95 text-white shadow-lg">
+      <div className="p-6 border-b border-primary/20">
         <div className="mb-3">
-          <WatuLogo size="md" showText={true} />
+          <h1 className="text-2xl font-bold text-white">watu</h1>
+          <p className="text-xs text-primary text-opacity-80 font-semibold">ADMIN PORTAL</p>
         </div>
-        <p className="text-xs text-green-100 font-semibold">ADMIN DASHBOARD</p>
       </div>
 
       <nav className="mt-8 space-y-1">
@@ -49,8 +49,8 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
               onClick={() => onTabChange(tab.id)}
               className={`w-full text-left px-6 py-3 transition font-medium flex items-center gap-3 ${
                 activeTab === tab.id
-                  ? 'bg-secondary text-white border-l-4 border-yellow-300 shadow-md'
-                  : 'text-green-100 hover:bg-primary/80 border-l-4 border-transparent'
+                  ? 'bg-primary text-white border-l-4 border-secondary shadow-md'
+                  : 'text-gray-300 hover:bg-watu-dark/80 border-l-4 border-transparent'
               }`}
             >
               <div className="w-5 h-5 flex-shrink-0">
@@ -63,8 +63,8 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="absolute bottom-0 w-64 p-4 border-t border-primary/30">
-        <p className="text-xs text-green-100">© 2026 Watu Credit</p>
+      <div className="absolute bottom-0 w-64 p-4 border-t border-primary/20">
+        <p className="text-xs text-gray-400">© 2026 Watu</p>
       </div>
     </aside>
   );
