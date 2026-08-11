@@ -16,6 +16,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -23,21 +24,32 @@ export default function DashboardPage() {
       router.push('/');
     } else {
       setUser({ name: 'Admin', email: 'admin@watucredit.co.ke', role: 'admin' });
+
+      // Load tab from localStorage, default to 'dashboard'
+      const savedTab = localStorage.getItem('activeTab') || 'dashboard';
+      setActiveTab(savedTab);
+      setIsReady(true);
     }
   }, [router]);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    // Save to localStorage so it persists on refresh
+    localStorage.setItem('activeTab', tab);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
     router.push('/');
   };
 
-  if (!user) {
+  if (!user || !isReady) {
     return null;
   }
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar user={user} onLogout={handleLogout} />
