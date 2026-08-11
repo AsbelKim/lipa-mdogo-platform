@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import WatuLogo from './WatuLogo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,11 +26,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-primary via-primary to-secondary flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Lipa Mdogo</h1>
-          <p className="text-gray-600 mt-2">Admin Dashboard</p>
+          <div className="flex justify-center mb-4">
+            <WatuLogo size="lg" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Admin Portal</h1>
+          <p className="text-gray-600 mt-1 text-sm">Asset Financing Management</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -70,19 +74,25 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-primary to-secondary hover:shadow-lg text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
         <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-center text-sm text-gray-600">
-            Test Credentials:
-            <br />
-            Email: admin@watucredit.co.ke
-            <br />
-            Password: password
+          <p className="text-center text-sm text-gray-600 mb-3">
+            <span className="font-semibold">Demo Credentials:</span>
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1 text-xs">
+            <p><span className="font-medium">Email:</span> admin@watucredit.co.ke</p>
+            <p><span className="font-medium">Password:</span> password</p>
+          </div>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+          <p className="text-xs text-gray-500">
+            © 2026 Watu Credit. All rights reserved.
           </p>
         </div>
       </div>

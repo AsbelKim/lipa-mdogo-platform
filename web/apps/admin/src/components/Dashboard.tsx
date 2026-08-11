@@ -21,44 +21,44 @@ export default function Dashboard() {
           value={stats.devices}
           icon="📱"
           bgColor="bg-blue-50"
-          textColor="text-blue-600"
+          textColor="text-blue-700"
         />
         <StatCard
           title="Total Customers"
           value={stats.customers}
           icon="👥"
-          bgColor="bg-green-50"
-          textColor="text-green-600"
+          bgColor="bg-primary/10"
+          textColor="text-primary"
         />
         <StatCard
           title="Active Sales"
           value={stats.sales}
           icon="💰"
-          bgColor="bg-amber-50"
-          textColor="text-amber-600"
+          bgColor="bg-secondary/10"
+          textColor="text-secondary"
         />
         <StatCard
           title="Total Payments"
           value={stats.payments}
           icon="💳"
           bgColor="bg-purple-50"
-          textColor="text-purple-600"
+          textColor="text-purple-700"
         />
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+          <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary">
             ➕ Add Device
           </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+          <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary">
             ➕ Add Customer
           </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+          <button className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary">
             ➕ Create Sale
           </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+          <button className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary">
             ➕ Log Payment
           </button>
         </div>

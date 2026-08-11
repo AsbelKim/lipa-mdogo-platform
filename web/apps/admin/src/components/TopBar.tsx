@@ -1,4 +1,5 @@
 import { User } from '@lipa/core';
+import WatuLogo from './WatuLogo';
 
 interface TopBarProps {
   user: User;
@@ -7,18 +8,23 @@ interface TopBarProps {
 
 export default function TopBar({ user, onLogout }: TopBarProps) {
   return (
-    <header className="bg-white border-b border-gray-200 shadow">
+    <header className="bg-gradient-to-r from-white to-gray-50 border-b-2 border-secondary shadow-sm">
       <div className="flex items-center justify-between px-8 py-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Welcome, {user.name}</h2>
-          <p className="text-sm text-gray-600">
-            {user.role.charAt(0).toUpperCase() + user.role.slice(1)} Account
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:block">
+            <WatuLogo size="sm" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Welcome, {user.name}</h2>
+            <p className="text-sm text-gray-600">
+              {user.role === 'admin' ? '👨‍💼 Administrator' : user.role === 'ops' ? '⚙️ Operations' : '👤'} Account
+            </p>
+          </div>
         </div>
 
         <button
           onClick={onLogout}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+          className="px-4 py-2 bg-secondary hover:bg-orange-700 text-white rounded-lg transition font-medium"
         >
           Logout
         </button>
