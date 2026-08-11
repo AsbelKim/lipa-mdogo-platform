@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Phone, PHONE_CATALOG } from '../types/phones';
 import IndividualPhoneList from './IndividualPhoneList';
+import PhoneModelDetail from './PhoneModelDetail';
 
 interface IndividualPhone {
   id: string;
@@ -14,12 +15,68 @@ interface IndividualPhone {
   condition: 'new' | 'refurbished' | 'used';
 }
 
+interface PhoneUnit {
+  id: string;
+  imei: string;
+  serialNumber: string;
+  condition: 'new' | 'refurbished' | 'used';
+  status: 'in-stock' | 'allocated' | 'sold' | 'damaged' | 'lost';
+  dateAdded: string;
+  allocatedAgent?: string;
+  allocatedDate?: string;
+  soldDate?: string;
+  soldTo?: string;
+}
+
 export default function PhoneInventory() {
   const [phones] = useState<Phone[]>(PHONE_CATALOG);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPhone, setSelectedPhone] = useState<Phone | null>(null);
   const [viewMode, setViewMode] = useState<'models' | 'individual'>('models');
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedModelUnits, setSelectedModelUnits] = useState<PhoneUnit[]>([]);
+  const [selectedModelName, setSelectedModelName] = useState('');
+
+  // Generate sample phone units for a model
+  const generatePhoneUnits = (model: Phone): PhoneUnit[] => {
+    const units: PhoneUnit[] = [];
+    const statuses: Array<'in-stock' | 'allocated' | 'sold' | 'damaged' | 'lost'> = [
+      'in-stock',
+      'allocated',
+      'sold',
+      'in-stock',
+      'damaged',
+    ];
+    const conditions: Array<'new' | 'refurbished' | 'used'> = ['new', 'refurbished', 'used'];
+    const sampleAgents = ['Michael Kipchoge', 'Rose Tata', 'James Mwangi', 'Fatima Hassan'];
+    const sampleCustomers = ['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Wilson'];
+
+    for (let i = 0; i < model.stockQuantity; i++) {
+      const status = statuses[i % statuses.length];
+      const condition = conditions[i % conditions.length];
+      const unit: PhoneUnit = {
+        id: `${model.id}-unit-${i}`,
+        imei: `35907208027652${String(i).padStart(2, '0')}`,
+        serialNumber: `RF9DL1A${String(i).padStart(3, '0')}`,
+        condition,
+        status,
+        dateAdded: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString(),
+        allocatedAgent: status === 'allocated' ? sampleAgents[i % sampleAgents.length] : undefined,
+        allocatedDate: status === 'allocated' ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+        soldTo: status === 'sold' ? sampleCustomers[i % sampleCustomers.length] : undefined,
+        soldDate: status === 'sold' ? new Date(Date.now() - Math.random() * 20 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+      };
+      units.push(unit);
+    }
+    return units;
+  };
+
+  const openModelDetail = (phone: Phone) => {
+    setSelectedModelName(phone.model);
+    setSelectedModelUnits(generatePhoneUnits(phone));
+    setDetailModalOpen(true);
+  };
   const [individualPhones, setIndividualPhones] = useState<IndividualPhone[]>([
     {
       id: 'phone-1',
@@ -196,8 +253,12 @@ export default function PhoneInventory() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredPhones.map((phone) => (
-                <tr key={phone.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{phone.model}</td>
+                <tr key={phone.id} className="hover:bg-gray-50 cursor-pointer transition">
+                  <td
+                    onClick={() => openModelDetail(phone)}
+                    className="px-6 py-4 text-sm font-medium text-primary hover:underline"
+                  >
+                    {phone.model}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{phone.specs}</td>
                   <td className="px-6 py-4 text-sm text-right text-gray-900">
                     <span className="font-semibold">{formatCurrency(phone.downPayment)}</span>
@@ -348,6 +409,14 @@ export default function PhoneInventory() {
           />
         </div>
       )}
+
+      {/* Phone Model Detail Modal */}
+      <PhoneModelDetail
+        isOpen={detailModalOpen}
+        onClose={() => setDetailModalOpen(false)}
+        modelName={selectedModelName}
+        units={selectedModelUnits}
+      />
     </div>
   );
 }
