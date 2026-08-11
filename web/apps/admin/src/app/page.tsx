@@ -1,24 +1,24 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@lipa/core';
-import LoginPage from './login/page';
-import Dashboard from './dashboard/page';
+import LoginPage from '../components/LoginPage';
 
 export default function Home() {
-  const { user, getCurrentUser, isAuthenticated } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const token = localStorage.getItem('auth_token');
     if (token) {
-      getCurrentUser().finally(() => setIsLoading(false));
+      // Redirect to dashboard if already logged in
+      router.push('/dashboard');
     } else {
-      setIsLoading(false);
+      setIsChecking(false);
     }
-  }, [getCurrentUser]);
+  }, [router]);
 
-  if (isLoading) {
+  if (isChecking) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
@@ -29,9 +29,5 @@ export default function Home() {
     );
   }
 
-  if (!isAuthenticated) {
-    return <LoginPage />;
-  }
-
-  return <Dashboard />;
+  return <LoginPage />;
 }

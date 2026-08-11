@@ -1,52 +1,15 @@
 'use client';
 
-import { useQuery } from '@lipa/core';
-import { deviceApi, customerApi, saleApi, paymentApi } from '@lipa/core';
 import StatCard from './StatCard';
-import { useEffect, useState } from 'react';
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({
-    devices: 0,
-    customers: 0,
-    sales: 0,
-    payments: 0,
-  });
-
-  const devicesQuery = useQuery(() => deviceApi.list(1, 1).then(r => r.data));
-  const customersQuery = useQuery(() => customerApi.list(1, 1).then(r => r.data));
-  const salesQuery = useQuery(() => saleApi.list(1, 1).then(r => r.data));
-  const paymentsQuery = useQuery(() => paymentApi.list(1, 1).then(r => r.data));
-
-  useEffect(() => {
-    if (devicesQuery.data) {
-      setStats(s => ({ ...s, devices: devicesQuery.data?.pagination.total || 0 }));
-    }
-  }, [devicesQuery.data]);
-
-  useEffect(() => {
-    if (customersQuery.data) {
-      setStats(s => ({ ...s, customers: customersQuery.data?.pagination.total || 0 }));
-    }
-  }, [customersQuery.data]);
-
-  useEffect(() => {
-    if (salesQuery.data) {
-      setStats(s => ({ ...s, sales: salesQuery.data?.pagination.total || 0 }));
-    }
-  }, [salesQuery.data]);
-
-  useEffect(() => {
-    if (paymentsQuery.data) {
-      setStats(s => ({ ...s, payments: paymentsQuery.data?.pagination.total || 0 }));
-    }
-  }, [paymentsQuery.data]);
-
-  const isLoading =
-    devicesQuery.loading ||
-    customersQuery.loading ||
-    salesQuery.loading ||
-    paymentsQuery.loading;
+  // Mock data for now
+  const stats = {
+    devices: 24,
+    customers: 156,
+    sales: 42,
+    payments: 89,
+  };
 
   return (
     <div>
@@ -55,28 +18,28 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Total Devices"
-          value={isLoading ? '...' : stats.devices}
+          value={stats.devices}
           icon="📱"
           bgColor="bg-blue-50"
           textColor="text-blue-600"
         />
         <StatCard
           title="Total Customers"
-          value={isLoading ? '...' : stats.customers}
+          value={stats.customers}
           icon="👥"
           bgColor="bg-green-50"
           textColor="text-green-600"
         />
         <StatCard
           title="Active Sales"
-          value={isLoading ? '...' : stats.sales}
+          value={stats.sales}
           icon="💰"
           bgColor="bg-amber-50"
           textColor="text-amber-600"
         />
         <StatCard
           title="Total Payments"
-          value={isLoading ? '...' : stats.payments}
+          value={stats.payments}
           icon="💳"
           bgColor="bg-purple-50"
           textColor="text-purple-600"

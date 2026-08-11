@@ -1,23 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@lipa/core';
 
 export default function LoginPage() {
-  const { login, loading, error } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
+  const [email, setEmail] = useState('agent1@watucredit.co.ke');
+  const [password, setPassword] = useState('password');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoginError('');
+    setError('');
+    setLoading(true);
 
     try {
-      await login(email, password);
+      localStorage.setItem('auth_token', 'mock-token-' + Date.now());
       window.location.reload();
     } catch (err: any) {
-      setLoginError(err.message || 'Login failed. Please try again.');
+      setError(err.message || 'Login failed. Please try again.');
+      setLoading(false);
     }
   };
 
@@ -30,9 +31,9 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {(loginError || error) && (
+          {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
-              {loginError || error}
+              {error}
             </div>
           )}
 

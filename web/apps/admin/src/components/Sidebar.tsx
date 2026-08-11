@@ -6,7 +6,8 @@ interface SidebarProps {
 export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'devices', label: 'Devices', icon: '📱' },
+    { id: 'phones', label: 'Phone Inventory', icon: '📱' },
+    { id: 'devices', label: 'Device Assignments', icon: '🔗' },
     { id: 'customers', label: 'Customers', icon: '👥' },
     { id: 'sales', label: 'Sales', icon: '💰' },
   ];

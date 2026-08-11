@@ -1,17 +1,20 @@
 'use client';
 
-import { useAuth } from '@lipa/core';
-import BottomNav from '@/components/BottomNav';
-import AgentHome from '@/components/AgentHome';
+import BottomNav from '../../components/BottomNav';
+import AgentHome from '../../components/AgentHome';
 import { useState } from 'react';
 
-export default function Home() {
-  const { user, logout } = useAuth();
+interface HomeProps {
+  user: any;
+  setUser: (user: any) => void;
+}
+
+export default function Home({ user, setUser }: HomeProps) {
   const [activeTab, setActiveTab] = useState('home');
 
-  const handleLogout = async () => {
-    await logout();
-    window.location.reload();
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    setUser(null);
   };
 
   if (!user) {

@@ -1,12 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-interface LoginPageProps {
-  onLoginSuccess?: (user: any) => void;
-}
-
-export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
+export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('admin@watucredit.co.ke');
   const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
@@ -18,9 +16,8 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     setLoading(true);
 
     try {
-      // For now, mock the login - just store token and reload
       localStorage.setItem('auth_token', 'mock-token-' + Date.now());
-      window.location.reload();
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
       setLoading(false);

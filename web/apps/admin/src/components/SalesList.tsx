@@ -1,12 +1,19 @@
 'use client';
 
-import { useQuery, formatCurrency } from '@lipa/core';
-import { saleApi } from '@lipa/core';
-
 export default function SalesList() {
-  const { data, loading, error } = useQuery(() =>
-    saleApi.list(1, 20).then(r => r.data)
-  );
+  const formatCurrency = (amount: number, currency: string = 'KES') => {
+    return new Intl.NumberFormat('en-KE', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const sales = [
+    { id: '1', amount: 50000, monthly_payment: 5556, duration_months: 12, status: 'active', currency: 'KES' },
+    { id: '2', amount: 75000, monthly_payment: 6250, duration_months: 12, status: 'active', currency: 'KES' },
+    { id: '3', amount: 30000, monthly_payment: 3000, duration_months: 12, status: 'draft', currency: 'KES' },
+  ];
 
   return (
     <div>
@@ -17,53 +24,48 @@ export default function SalesList() {
         </button>
       </div>
 
-      {loading && <p className="text-gray-600">Loading sales...</p>}
-      {error && <p className="text-red-600">{error}</p>}
-
-      {data && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Amount</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Monthly</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Duration</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
-                <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Actions</th>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Amount</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Monthly</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Duration</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {sales.map((sale) => (
+              <tr key={sale.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  {formatCurrency(sale.amount, sale.currency)}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-600">
+                  {formatCurrency(sale.monthly_payment, sale.currency)}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-600">{sale.duration_months}M</td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                      sale.status === 'active'
+                        ? 'bg-green-100 text-green-800'
+                        : sale.status === 'draft'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {sale.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 text-right text-sm">
+                  <button className="text-primary hover:underline">View</button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {data.data.map((sale) => (
-                <tr key={sale.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {formatCurrency(sale.amount, sale.currency)}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {formatCurrency(sale.monthly_payment, sale.currency)}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{sale.duration_months}M</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                        sale.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : sale.status === 'draft'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {sale.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm">
-                    <button className="text-primary hover:underline">View</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

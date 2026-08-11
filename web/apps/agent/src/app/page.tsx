@@ -1,22 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '@lipa/core';
 import LoginPage from './login/page';
 import Home from './home/page';
 
 export default function Page() {
-  const { user, getCurrentUser, isAuthenticated } = useAuth();
+  const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const token = localStorage.getItem('auth_token');
     if (token) {
-      getCurrentUser().finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
+      setUser({ name: 'Sales Agent', email: 'agent1@watucredit.co.ke', role: 'agent' });
     }
-  }, [getCurrentUser]);
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return (
@@ -29,9 +27,9 @@ export default function Page() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return <LoginPage />;
   }
 
-  return <Home />;
+  return <Home user={user} setUser={setUser} />;
 }
