@@ -11,6 +11,7 @@ import AgentInventoryDetail from '../../components/AgentInventoryDetail';
 import DevicesList from '../../components/DevicesList';
 import CustomersList from '../../components/CustomersList';
 import SalesList from '../../components/SalesList';
+import ChatBot from '../../components/ChatBot';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -66,6 +67,9 @@ export default function DashboardPage() {
           </div>
         </main>
       </div>
+
+      {/* Chat Bot */}
+      <ChatBot />
     </div>
   );
 }
