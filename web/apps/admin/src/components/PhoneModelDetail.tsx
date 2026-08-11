@@ -20,6 +20,7 @@ interface PhoneModelDetailProps {
   onClose: () => void;
   modelName: string;
   units: PhoneUnit[];
+  onAllocate?: (unit: PhoneUnit, agentId: string) => void;
 }
 
 export default function PhoneModelDetail({
@@ -27,10 +28,45 @@ export default function PhoneModelDetail({
   onClose,
   modelName,
   units,
+  onAllocate,
 }: PhoneModelDetailProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterCondition, setFilterCondition] = useState<string>('all');
+  const [allocationModalOpen, setAllocationModalOpen] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState<PhoneUnit | null>(null);
+  const [selectedAgent, setSelectedAgent] = useState<string>('');
+
+  const agents = [
+    { id: 'agent-1', name: 'Michael Kipchoge', location: 'Nairobi' },
+    { id: 'agent-2', name: 'Rose Tata', location: 'Mombasa' },
+    { id: 'agent-3', name: 'James Mwangi', location: 'Kisumu' },
+    { id: 'agent-4', name: 'Fatima Hassan', location: 'Nakuru' },
+    { id: 'agent-5', name: 'David Kipchoge', location: 'Eldoret' },
+    { id: 'agent-6', name: 'Susan Njeri', location: 'Kericho' },
+  ];
+
+  const handleAllocateClick = (unit: PhoneUnit) => {
+    if (unit.status === 'in-stock') {
+      setSelectedUnit(unit);
+      setSelectedAgent('');
+      setAllocationModalOpen(true);
+    } else {
+      alert('Only in-stock phones can be allocated');
+    }
+  };
+
+  const handleConfirmAllocation = () => {
+    if (selectedUnit && selectedAgent) {
+      if (onAllocate) {
+        onAllocate(selectedUnit, selectedAgent);
+      }
+      alert(`✅ Phone allocated successfully to ${agents.find(a => a.id === selectedAgent)?.name}`);
+      setAllocationModalOpen(false);
+      setSelectedUnit(null);
+      setSelectedAgent('');
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -191,6 +227,7 @@ export default function PhoneModelDetail({
                 <th className="px-4 py-3 text-center font-semibold text-gray-900">Status</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-900">Added Date</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-900">Details</th>
+                <th className="px-4 py-3 text-center font-semibold text-gray-900">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -234,6 +271,19 @@ export default function PhoneModelDetail({
                         <span className="text-green-600">Available</span>
                       )}
                     </td>
+                    <td className="px-4 py-3 text-center">
+                      {unit.status === 'in-stock' && (
+                        <button
+                          onClick={() => handleAllocateClick(unit)}
+                          className="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/90 transition font-medium"
+                        >
+                          Allocate
+                        </button>
+                      )}
+                      {unit.status !== 'in-stock' && (
+                        <span className="text-gray-400 text-xs">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -260,6 +310,64 @@ export default function PhoneModelDetail({
           </button>
         </div>
       </div>
+
+      {/* Allocation Modal */}
+      {allocationModalOpen && selectedUnit && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Allocate Phone to Agent</h3>
+
+            {/* Phone Details */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-gray-600">Phone Details:</p>
+              <p className="font-mono text-sm font-medium mt-1">IMEI: {selectedUnit.imei}</p>
+              <p className="text-sm text-gray-600">Serial: {selectedUnit.serialNumber}</p>
+              <p className="text-sm text-gray-600">Model: {modelName}</p>
+              <p className="text-sm text-gray-600">Condition: <span className="font-medium">{selectedUnit.condition}</span></p>
+            </div>
+
+            {/* Agent Selection */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Sales Agent *
+              </label>
+              <select
+                value={selectedAgent}
+                onChange={(e) => setSelectedAgent(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="">Choose an agent...</option>
+                {agents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.name} ({agent.location})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setAllocationModalOpen(false);
+                  setSelectedUnit(null);
+                  setSelectedAgent('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmAllocation}
+                disabled={!selectedAgent}
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Allocate
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
