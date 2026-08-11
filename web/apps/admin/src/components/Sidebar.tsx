@@ -53,7 +53,9 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
                   : 'text-green-100 hover:bg-primary/80 border-l-4 border-transparent'
               }`}
             >
-              <IconComponent />
+              <div className="w-5 h-5 flex-shrink-0">
+                <IconComponent />
+              </div>
               {tab.label}
             </button>
           );

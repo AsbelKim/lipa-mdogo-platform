@@ -51,20 +51,28 @@ export default function Dashboard() {
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary flex flex-col items-center gap-2">
-            <PlusIcon />
-            Add Device
+            <div className="w-6 h-6">
+              <PlusIcon />
+            </div>
+            <span className="text-sm">Add Device</span>
           </button>
           <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary flex flex-col items-center gap-2">
-            <AlertIcon />
-            Add Customer
+            <div className="w-6 h-6">
+              <AlertIcon />
+            </div>
+            <span className="text-sm">Add Customer</span>
           </button>
           <button className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary flex flex-col items-center gap-2">
-            <ShoppingIcon />
-            Create Sale
+            <div className="w-6 h-6">
+              <ShoppingIcon />
+            </div>
+            <span className="text-sm">Create Sale</span>
           </button>
           <button className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary flex flex-col items-center gap-2">
-            <CreditCardIcon />
-            Log Payment
+            <div className="w-6 h-6">
+              <CreditCardIcon />
+            </div>
+            <span className="text-sm">Log Payment</span>
           </button>
         </div>
       </div>
