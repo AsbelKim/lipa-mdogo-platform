@@ -19,9 +19,12 @@ interface IndividualPhoneAllocation {
 }
 
 export default function AgentAllocationManager() {
-  const [agents] = useState(SALES_AGENTS);
+  const [agents, setAgents] = useState(SALES_AGENTS);
   const [showAllocationForm, setShowAllocationForm] = useState(false);
   const [selectedAgentView, setSelectedAgentView] = useState<string | null>(null);
+  const [detailModalAgent, setDetailModalAgent] = useState<typeof SALES_AGENTS[0] | null>(null);
+  const [isEditingAgent, setIsEditingAgent] = useState(false);
+  const [editedAgent, setEditedAgent] = useState<typeof SALES_AGENTS[0] | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<string>('');
   const [selectedPhoneImei, setSelectedPhoneImei] = useState<string>('');
 
@@ -135,6 +138,28 @@ export default function AgentAllocationManager() {
     }
   };
 
+  const handleEditAgent = (agent: typeof SALES_AGENTS[0]) => {
+    setEditedAgent({ ...agent });
+    setIsEditingAgent(true);
+  };
+
+  const handleSaveAgent = () => {
+    if (!editedAgent) return;
+
+    setAgents(agents.map((a) => (a.id === editedAgent.id ? editedAgent : a)));
+    if (detailModalAgent) {
+      setDetailModalAgent(editedAgent);
+    }
+    setIsEditingAgent(false);
+    setEditedAgent(null);
+    alert('✅ Agent details updated successfully!');
+  };
+
+  const handleRemovePhoneFromAgent = (phoneId: string) => {
+    setAllocatedPhones(allocatedPhones.filter((p) => p.id !== phoneId));
+    alert('✅ Phone removed from agent!');
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -229,7 +254,7 @@ export default function AgentAllocationManager() {
             <div
               key={agent.id}
               className="bg-white rounded-lg shadow border border-gray-200 hover:shadow-lg transition cursor-pointer"
-              onClick={() => setSelectedAgentView(selectedAgentView === agent.id ? null : agent.id)}
+              onClick={() => setDetailModalAgent(agent)}
             >
               <div className="p-4">
                 <div className="flex justify-between items-start mb-3">
@@ -268,47 +293,9 @@ export default function AgentAllocationManager() {
                   </div>
                 </div>
 
-                {selectedAgentView === agent.id && agentPhones.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h4 className="font-semibold text-gray-900 mb-3">Allocated Phones</h4>
-                    <div className="space-y-2 max-h-80 overflow-y-auto">
-                      {agentPhones.map((phone) => (
-                        <div key={phone.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{phone.model}</p>
-                              <p className="text-xs text-gray-600 font-mono">IMEI: {phone.imei}</p>
-                              <p className="text-xs text-gray-600">Serial: {phone.serialNumber}</p>
-                            </div>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ml-2 ${
-                                phone.status === 'sold'
-                                  ? 'bg-green-100 text-green-800'
-                                  : phone.status === 'in-stock'
-                                  ? 'bg-amber-100 text-amber-800'
-                                  : 'bg-red-100 text-red-800'
-                              }`}
-                            >
-                              {phone.status === 'sold' ? '✓ Sold' : phone.status === 'in-stock' ? '📱 In Stock' : 'Damaged'}
-                            </span>
-                          </div>
-                          <div className="flex gap-2 text-xs text-gray-500">
-                            <span>Condition: <strong>{phone.condition}</strong></span>
-                            {phone.status === 'sold' && phone.customerName && (
-                              <span>Customer: <strong>{phone.customerName}</strong></span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {selectedAgentView === agent.id && agentPhones.length === 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-200 text-center text-gray-600 text-sm">
-                    No phones allocated to this agent
-                  </div>
-                )}
+                <div className="mt-3 text-xs text-gray-500 text-center">
+                  Click to view details, stocks & edit
+                </div>
               </div>
             </div>
           );
