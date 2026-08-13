@@ -28,6 +28,7 @@ export default function AgentAllocationManager() {
   const [selectedAgent, setSelectedAgent] = useState<string>('');
   const [selectedPhoneImei, setSelectedPhoneImei] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [agentSearchQuery, setAgentSearchQuery] = useState<string>('');
 
   // Sample allocated phones data with localStorage persistence
   const [allocatedPhones, setAllocatedPhones] = useState<IndividualPhoneAllocation[]>([]);
@@ -177,6 +178,16 @@ export default function AgentAllocationManager() {
     (phone) => !allocatedPhones.some((alloc) => alloc.phoneId === phone.phoneId)
   );
 
+  // Filter agents based on search query
+  const filteredAgents = agents.filter((agent) => {
+    const searchLower = agentSearchQuery.toLowerCase();
+    return (
+      agent.name.toLowerCase().includes(searchLower) ||
+      agent.phone.includes(agentSearchQuery) ||
+      agent.location.toLowerCase().includes(searchLower)
+    );
+  });
+
   const getAgentPhones = (agentId: string) => {
     return allocatedPhones.filter((p) => p.agentId === agentId);
   };
@@ -276,23 +287,41 @@ export default function AgentAllocationManager() {
       </div>
 
       {/* Allocation Form Modal */}
-      <Modal isOpen={showAllocationForm} onClose={() => setShowAllocationForm(false)} title="Allocate Phone to Agent">
+      <Modal isOpen={showAllocationForm} onClose={() => {
+        setShowAllocationForm(false);
+        setAgentSearchQuery('');
+        setSelectedAgent('');
+      }} title="Allocate Phone to Agent">
         <form onSubmit={handleAllocate} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Sales Agent *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Sales Agent * (Search or Select)</label>
+            <input
+              type="text"
+              placeholder="Search by name, phone, or location..."
+              value={agentSearchQuery}
+              onChange={(e) => setAgentSearchQuery(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mb-2"
+            />
             <select
               value={selectedAgent}
               onChange={(e) => setSelectedAgent(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               required
             >
-              <option value="">Select an agent...</option>
-              {agents.map((agent) => (
+              <option value="">
+                {agentSearchQuery
+                  ? `Select from ${filteredAgents.length} result${filteredAgents.length !== 1 ? 's' : ''}...`
+                  : 'Select an agent...'}
+              </option>
+              {filteredAgents.map((agent) => (
                 <option key={agent.id} value={agent.id}>
-                  {agent.name} ({agent.location})
+                  {agent.name} ({agent.location}) - {agent.phone}
                 </option>
               ))}
             </select>
+            {agentSearchQuery && filteredAgents.length === 0 && (
+              <p className="text-yellow-600 text-xs mt-2">⚠️ No agents match your search</p>
+            )}
           </div>
 
           <div>

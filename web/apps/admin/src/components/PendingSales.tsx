@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Modal from './Modal';
+import { validationRules } from '../utils/validationHelpers';
 
 interface PendingSale {
   id: string;
