@@ -9,6 +9,13 @@ interface Message {
   sender: 'user' | 'agent';
   timestamp: Date;
   actionType?: string;
+  actions?: ActionButton[];
+}
+
+interface ActionButton {
+  label: string;
+  action: string;
+  type: 'primary' | 'secondary';
 }
 
 export default function AIAgent() {
@@ -23,6 +30,8 @@ export default function AIAgent() {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showQuickForm, setShowQuickForm] = useState<string | null>(null);
+  const [formData, setFormData] = useState<Record<string, string>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -106,28 +115,130 @@ export default function AIAgent() {
     };
   };
 
-  const getAgentResponse = (commandType: string): string => {
-    const responses: Record<string, string> = {
-      ADD_CUSTOMER: `I can help you add a customer to DAKIRO's system. Please provide the following details:\n• Customer Name\n• Phone Number\n• National ID\n• Location\n\nJust type the details and I'll add them to the system.`,
+  const getAgentResponse = (commandType: string): { text: string; actions?: ActionButton[] } => {
+    const responses: Record<string, { text: string; actions?: ActionButton[] }> = {
+      ADD_CUSTOMER: {
+        text: `I'll help you add a customer to DAKIRO's system. Click the button below to open the form.`,
+        actions: [
+          { label: '➕ Add Customer', action: 'SHOW_ADD_CUSTOMER_FORM', type: 'primary' },
+          { label: '📋 View Customers', action: 'VIEW_CUSTOMERS', type: 'secondary' },
+        ],
+      },
 
-      ADD_DEVICE: `To add a phone device to inventory, I'll need:\n• Phone Model (e.g., Samsung A05)\n• IMEI Number (15 digits)\n• Serial Number\n• Condition (new/refurbished/used)\n\nProvide these details and I'll add it to DAKIRO's inventory.`,
+      ADD_DEVICE: {
+        text: `I'll help you add a phone device to inventory. Click the button below to open the form.`,
+        actions: [
+          { label: '📱 Add Device', action: 'SHOW_ADD_DEVICE_FORM', type: 'primary' },
+          { label: '📦 View Inventory', action: 'VIEW_INVENTORY', type: 'secondary' },
+        ],
+      },
 
-      CREATE_SALE: `I can create a new sale record. Please provide:\n• Customer Name (or search from existing)\n• Phone Model\n• Sales Agent Name\n• Down Payment Amount\n• Installment Duration (months)\n\nI'll record this as a new sale.`,
+      CREATE_SALE: {
+        text: `I'll help you create a new sale record. Click the button below to open the form.`,
+        actions: [
+          { label: '💳 Create Sale', action: 'SHOW_CREATE_SALE_FORM', type: 'primary' },
+          { label: '📊 View Sales', action: 'VIEW_SALES', type: 'secondary' },
+        ],
+      },
 
-      LOG_PAYMENT: `To log a payment, I need:\n• Sale Reference/Customer Name\n• Payment Amount\n• Payment Method (M-Pesa, Bank, Cash)\n• Transaction Reference (if applicable)\n\nI'll record the payment immediately.`,
+      LOG_PAYMENT: {
+        text: `I'll help you log a payment. Click the button below to open the form.`,
+        actions: [
+          { label: '💰 Log Payment', action: 'SHOW_LOG_PAYMENT_FORM', type: 'primary' },
+          { label: '📈 View Payments', action: 'VIEW_PAYMENTS', type: 'secondary' },
+        ],
+      },
 
-      RECEIPT: `I can generate a receipt for DAKIRO GENERAL ELECTRONICS. Tell me:\n• Customer Name\n• Items Purchased\n• Amount\n• Agent Name\n\nI'll create a professional receipt in DAKIRO's format.`,
+      RECEIPT: {
+        text: `I can generate a professional receipt for DAKIRO GENERAL ELECTRONICS. Let me help you with that!`,
+        actions: [
+          { label: '📄 Generate Receipt', action: 'SHOW_RECEIPT_FORM', type: 'primary' },
+          { label: '🖨️ View Recent', action: 'VIEW_RECENT_RECEIPTS', type: 'secondary' },
+        ],
+      },
 
-      SEARCH: `I can search DAKIRO's database for:\n• Customers (by name or phone)\n• Devices (by IMEI or model)\n• Sales records\n• Agents\n\nWhat would you like to search for?`,
+      SEARCH: {
+        text: `I can search DAKIRO's database. What would you like to search for? Type your search term or click a button below.`,
+        actions: [
+          { label: '👥 Search Customers', action: 'SEARCH_CUSTOMERS', type: 'secondary' },
+          { label: '📱 Search Devices', action: 'SEARCH_DEVICES', type: 'secondary' },
+        ],
+      },
 
-      HELP: `I'm DAKIRO's AI Assistant. Here's what I can do:\n\n📱 **Inventory**: Add devices, search IMEI numbers\n👥 **Customers**: Register new customers, view profiles\n💳 **Sales**: Create sales records, track deals\n💰 **Payments**: Log payments, track installments\n📄 **Receipts**: Generate professional receipts\n📊 **Reports**: View sales data and statistics\n\nJust ask me to do any of these tasks!`,
+      HELP: {
+        text: `I'm DAKIRO's AI Assistant. Here's what I can do:\n\n📱 **Inventory**: Add devices, search IMEI numbers\n👥 **Customers**: Register new customers, view profiles\n💳 **Sales**: Create sales records, track deals\n💰 **Payments**: Log payments, track installments\n📄 **Receipts**: Generate professional receipts\n📊 **Reports**: View sales data and statistics\n\nJust ask me to do any of these tasks!`,
+      },
 
-      INFO: `Welcome to DAKIRO GENERAL ELECTRONICS!\n\n${DEALER_CONFIG.name}\nP.O BOX ${DEALER_CONFIG.poBox}, ${DEALER_CONFIG.location}\nTel: ${DEALER_CONFIG.phone}\n${DEALER_CONFIG.address}\n\nWe deal in: ${DEALER_CONFIG.dealersIn.join(', ')}\n\nI'm here to help manage your business efficiently!`,
+      INFO: {
+        text: `Welcome to DAKIRO GENERAL ELECTRONICS!\n\n${DEALER_CONFIG.name}\nP.O BOX ${DEALER_CONFIG.poBox}, ${DEALER_CONFIG.location}\nTel: ${DEALER_CONFIG.phone}\n${DEALER_CONFIG.address}\n\nWe deal in: ${DEALER_CONFIG.dealersIn.join(', ')}\n\nI'm here to help manage your business efficiently!`,
+      },
 
-      QUESTION: `I appreciate your question! While I'm primarily designed to help with business tasks, I'm always learning. For complex questions about DAKIRO's operations, feel free to ask the team or explore the relevant section in the app.\n\nIs there a specific task I can help you with?`,
+      QUESTION: {
+        text: `I appreciate your question! While I'm primarily designed to help with business tasks, I'm always learning. For complex questions about DAKIRO's operations, feel free to ask the team or explore the relevant section in the app.\n\nIs there a specific task I can help you with?`,
+      },
     };
 
     return responses[commandType] || responses.QUESTION;
+  };
+
+  const handleActionClick = (action: string) => {
+    const actionHandlers: Record<string, () => void> = {
+      'SHOW_ADD_CUSTOMER_FORM': () => {
+        addMessage('Opening customer form...', 'user');
+        setShowQuickForm('ADD_CUSTOMER');
+      },
+      'SHOW_ADD_DEVICE_FORM': () => {
+        addMessage('Opening device form...', 'user');
+        setShowQuickForm('ADD_DEVICE');
+      },
+      'SHOW_CREATE_SALE_FORM': () => {
+        addMessage('Opening sale form...', 'user');
+        setShowQuickForm('CREATE_SALE');
+      },
+      'SHOW_LOG_PAYMENT_FORM': () => {
+        addMessage('Opening payment form...', 'user');
+        setShowQuickForm('LOG_PAYMENT');
+      },
+      'SHOW_RECEIPT_FORM': () => {
+        addMessage('Opening receipt generator...', 'user');
+        setShowQuickForm('RECEIPT');
+      },
+      'VIEW_CUSTOMERS': () => {
+        addMessage('🔄 Navigating to Customers section...', 'agent');
+      },
+      'VIEW_INVENTORY': () => {
+        addMessage('🔄 Navigating to Phone Inventory...', 'agent');
+      },
+      'VIEW_SALES': () => {
+        addMessage('🔄 Navigating to Sales...', 'agent');
+      },
+      'VIEW_PAYMENTS': () => {
+        addMessage('🔄 Navigating to Payments...', 'agent');
+      },
+      'SEARCH_CUSTOMERS': () => {
+        addMessage('Search by customer name or phone...', 'agent');
+        setShowQuickForm('SEARCH_CUSTOMER');
+      },
+      'SEARCH_DEVICES': () => {
+        addMessage('Search by IMEI or model name...', 'agent');
+        setShowQuickForm('SEARCH_DEVICE');
+      },
+    };
+
+    const handler = actionHandlers[action];
+    if (handler) {
+      handler();
+    }
+  };
+
+  const addMessage = (text: string, sender: 'user' | 'agent') => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      text,
+      sender,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, newMessage]);
   };
 
   const handleSendMessage = async () => {
@@ -147,12 +258,14 @@ export default function AIAgent() {
     // Simulate processing time
     setTimeout(() => {
       const command = parseCommand(inputValue);
+      const response = getAgentResponse(command.type);
       const agentResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: getAgentResponse(command.type),
+        text: response.text,
         sender: 'agent',
         timestamp: new Date(),
         actionType: command.type,
+        actions: response.actions,
       };
 
       setMessages((prev) => [...prev, agentResponse]);
@@ -221,7 +334,24 @@ export default function AIAgent() {
                       : 'bg-gray-200 text-gray-900 rounded-bl-none'
                   }`}
                 >
-                  {msg.text}
+                  <div>{msg.text}</div>
+                  {msg.actions && msg.actions.length > 0 && (
+                    <div className="mt-3 flex flex-col gap-2">
+                      {msg.actions.map((btn, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleActionClick(btn.action)}
+                          className={`w-full px-3 py-2 rounded text-xs font-medium transition ${
+                            btn.type === 'primary'
+                              ? 'bg-primary hover:bg-primary/90 text-white'
+                              : 'bg-white hover:bg-gray-100 text-primary border border-primary'
+                          }`}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -287,6 +417,237 @@ export default function AIAgent() {
               </button>
             </div>
           </div>
+
+        {/* Quick Forms Modal */}
+        {showQuickForm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {showQuickForm === 'ADD_CUSTOMER' && '➕ Add Customer'}
+                  {showQuickForm === 'ADD_DEVICE' && '📱 Add Device'}
+                  {showQuickForm === 'CREATE_SALE' && '💳 Create Sale'}
+                  {showQuickForm === 'LOG_PAYMENT' && '💰 Log Payment'}
+                  {showQuickForm === 'RECEIPT' && '📄 Generate Receipt'}
+                  {showQuickForm === 'SEARCH_CUSTOMER' && '🔍 Search Customer'}
+                  {showQuickForm === 'SEARCH_DEVICE' && '🔍 Search Device'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowQuickForm(null);
+                    setFormData({});
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {showQuickForm === 'ADD_CUSTOMER' && (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Customer Name"
+                      value={formData.name || ''}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone Number"
+                      value={formData.phone || ''}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="National ID"
+                      value={formData.id || ''}
+                      onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Location"
+                      value={formData.location || ''}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                  </>
+                )}
+
+                {showQuickForm === 'ADD_DEVICE' && (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Phone Model (e.g., Samsung A05)"
+                      value={formData.model || ''}
+                      onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="IMEI (15 digits)"
+                      value={formData.imei || ''}
+                      onChange={(e) => setFormData({ ...formData, imei: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Serial Number"
+                      value={formData.serial || ''}
+                      onChange={(e) => setFormData({ ...formData, serial: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <select
+                      value={formData.condition || ''}
+                      onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    >
+                      <option value="">Select Condition</option>
+                      <option value="new">New</option>
+                      <option value="refurbished">Refurbished</option>
+                      <option value="used">Used</option>
+                    </select>
+                  </>
+                )}
+
+                {showQuickForm === 'CREATE_SALE' && (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Customer Name"
+                      value={formData.customer || ''}
+                      onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Phone Model"
+                      value={formData.model || ''}
+                      onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Agent Name"
+                      value={formData.agent || ''}
+                      onChange={(e) => setFormData({ ...formData, agent: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Down Payment Amount"
+                      value={formData.amount || ''}
+                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                  </>
+                )}
+
+                {showQuickForm === 'LOG_PAYMENT' && (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Customer Name / Reference"
+                      value={formData.reference || ''}
+                      onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Payment Amount"
+                      value={formData.amount || ''}
+                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <select
+                      value={formData.method || ''}
+                      onChange={(e) => setFormData({ ...formData, method: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    >
+                      <option value="">Payment Method</option>
+                      <option value="mpesa">M-Pesa</option>
+                      <option value="bank">Bank Transfer</option>
+                      <option value="cash">Cash</option>
+                    </select>
+                  </>
+                )}
+
+                {showQuickForm === 'RECEIPT' && (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Customer Name"
+                      value={formData.customer || ''}
+                      onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Items Purchased"
+                      value={formData.items || ''}
+                      onChange={(e) => setFormData({ ...formData, items: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Amount"
+                      value={formData.amount || ''}
+                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Agent Name"
+                      value={formData.agent || ''}
+                      onChange={(e) => setFormData({ ...formData, agent: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                  </>
+                )}
+
+                {(showQuickForm === 'SEARCH_CUSTOMER' || showQuickForm === 'SEARCH_DEVICE') && (
+                  <input
+                    type="text"
+                    placeholder={showQuickForm === 'SEARCH_CUSTOMER' ? 'Name or phone number' : 'IMEI or model name'}
+                    value={formData.query || ''}
+                    onChange={(e) => setFormData({ ...formData, query: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                  />
+                )}
+              </div>
+
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={() => {
+                    if (Object.values(formData).some((v) => v)) {
+                      addMessage(
+                        `✅ ${showQuickForm} completed!\n${JSON.stringify(formData, null, 2)}`,
+                        'agent'
+                      );
+                      setShowQuickForm(null);
+                      setFormData({});
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition font-medium text-sm"
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={() => {
+                    setShowQuickForm(null);
+                    setFormData({});
+                  }}
+                  className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         </div>
       )}
     </>
