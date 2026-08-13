@@ -22,7 +22,6 @@ interface NavTab {
 export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const tabs: NavTab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
-    { id: 'dealers', label: 'Dealer Management', icon: ShoppingIcon },
     { id: 'phones', label: 'Phone Inventory', icon: PhoneIcon },
     { id: 'agents', label: 'Agent Allocation', icon: UsersIcon },
     { id: 'agent-inventory', label: 'Agent Stock View', icon: ShoppingIcon },

@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import Sidebar from '../../components/Sidebar';
 import TopBar from '../../components/TopBar';
 import DashboardContent from '../../components/Dashboard';
-import DealerManagement from '../../components/DealerManagement';
 import PhoneInventory from '../../components/PhoneInventory';
 import AgentAllocationManager from '../../components/AgentAllocationManager';
 import AgentInventoryDetail from '../../components/AgentInventoryDetail';
@@ -61,7 +60,6 @@ export default function DashboardPage() {
         <main className="flex-1 overflow-y-auto">
           <div className="p-8">
             {activeTab === 'dashboard' && <DashboardContent />}
-            {activeTab === 'dealers' && <DealerManagement />}
             {activeTab === 'phones' && <PhoneInventory />}
             {activeTab === 'agents' && <AgentAllocationManager />}
             {activeTab === 'agent-inventory' && <AgentInventoryDetail />}
