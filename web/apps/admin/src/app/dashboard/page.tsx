@@ -9,6 +9,7 @@ import PhoneInventory from '../../components/PhoneInventory';
 import AgentAllocationManager from '../../components/AgentAllocationManager';
 import AgentInventoryDetail from '../../components/AgentInventoryDetail';
 import DevicesList from '../../components/DevicesList';
+import PendingSales from '../../components/PendingSales';
 import CustomersList from '../../components/CustomersList';
 import SoldPhonesList from '../../components/SoldPhonesList';
 import SalesAnalytics from '../../components/SalesAnalytics';
@@ -64,6 +65,7 @@ export default function DashboardPage() {
             {activeTab === 'agents' && <AgentAllocationManager />}
             {activeTab === 'agent-inventory' && <AgentInventoryDetail />}
             {activeTab === 'devices' && <DevicesList />}
+            {activeTab === 'pending-sales' && <PendingSales />}
             {activeTab === 'customers' && <CustomersList />}
             {activeTab === 'sold-phones' && <SoldPhonesList />}
             {activeTab === 'sales' && <SalesAnalytics />}
