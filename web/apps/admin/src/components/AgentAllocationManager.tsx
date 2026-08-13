@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SALES_AGENTS } from '../types/agents';
 import Modal from './Modal';
+import { addNotification } from './Notifications';
+import { showToast } from './Toast';
 
 interface IndividualPhoneAllocation {
   id: string;
@@ -27,48 +29,95 @@ export default function AgentAllocationManager() {
   const [editedAgent, setEditedAgent] = useState<typeof SALES_AGENTS[0] | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<string>('');
   const [selectedPhoneImei, setSelectedPhoneImei] = useState<string>('');
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [agentSearchQuery, setAgentSearchQuery] = useState<string>('');
 
-  // Sample allocated phones data
-  const [allocatedPhones, setAllocatedPhones] = useState<IndividualPhoneAllocation[]>([
-    {
-      id: 'alloc-1',
-      agentId: 'agent-1',
-      phoneId: 'phone-1',
-      model: 'Samsung Galaxy A56 5G',
-      imei: '359072080276522',
-      serialNumber: 'RF9DL1A20GU',
-      condition: 'new',
-      status: 'in-stock',
-      dateAllocated: new Date().toISOString(),
-    },
-    {
-      id: 'alloc-2',
-      agentId: 'agent-1',
-      phoneId: 'phone-2',
-      model: 'Samsung Galaxy A56 5G',
-      imei: '359072080276523',
-      serialNumber: 'RF9DL1A20GV',
-      condition: 'new',
-      status: 'sold',
-      dateAllocated: new Date().toISOString(),
-      dateSold: new Date().toISOString(),
-      customerName: 'John Doe',
-    },
-    {
-      id: 'alloc-3',
-      agentId: 'agent-2',
-      phoneId: 'phone-3',
-      model: 'Samsung Galaxy A36 5G',
-      imei: '359072080276524',
-      serialNumber: 'RF9DL1A20GW',
-      condition: 'refurbished',
-      status: 'in-stock',
-      dateAllocated: new Date().toISOString(),
-    },
-  ]);
+  // Sample allocated phones data with localStorage persistence
+  const [allocatedPhones, setAllocatedPhones] = useState<IndividualPhoneAllocation[]>([]);
 
-  // Available phones for allocation (in-stock phones not yet allocated)
-  const availablePhones: IndividualPhoneAllocation[] = [
+  // Load from localStorage on mount
+  useEffect(() => {
+    const savedAllocations = localStorage.getItem('agentAllocations');
+    const savedAgents = localStorage.getItem('agentDetails');
+
+    if (savedAllocations) {
+      try {
+        setAllocatedPhones(JSON.parse(savedAllocations));
+      } catch (e) {
+        console.error('Failed to load allocations:', e);
+      }
+    } else {
+      // Initialize with default data on first load
+      const defaultAllocations: IndividualPhoneAllocation[] = [
+        {
+          id: 'alloc-1',
+          agentId: 'agent-1',
+          phoneId: 'phone-1',
+          model: 'Samsung Galaxy A56 5G',
+          imei: '359072080276522',
+          serialNumber: 'RF9DL1A20GU',
+          condition: 'new',
+          status: 'in-stock',
+          dateAllocated: new Date().toISOString(),
+        },
+        {
+          id: 'alloc-2',
+          agentId: 'agent-1',
+          phoneId: 'phone-2',
+          model: 'Samsung Galaxy A56 5G',
+          imei: '359072080276523',
+          serialNumber: 'RF9DL1A20GV',
+          condition: 'new',
+          status: 'sold',
+          dateAllocated: new Date().toISOString(),
+          dateSold: new Date().toISOString(),
+          customerName: 'John Doe',
+        },
+        {
+          id: 'alloc-3',
+          agentId: 'agent-2',
+          phoneId: 'phone-3',
+          model: 'Samsung Galaxy A36 5G',
+          imei: '359072080276524',
+          serialNumber: 'RF9DL1A20GW',
+          condition: 'refurbished',
+          status: 'in-stock',
+          dateAllocated: new Date().toISOString(),
+        },
+      ];
+      setAllocatedPhones(defaultAllocations);
+      localStorage.setItem('agentAllocations', JSON.stringify(defaultAllocations));
+    }
+
+    if (savedAgents) {
+      try {
+        setAgents(JSON.parse(savedAgents));
+      } catch (e) {
+        console.error('Failed to load agents:', e);
+      }
+    } else {
+      localStorage.setItem('agentDetails', JSON.stringify(SALES_AGENTS));
+    }
+
+    setIsLoaded(true);
+  }, []);
+
+  // Save allocations to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('agentAllocations', JSON.stringify(allocatedPhones));
+    }
+  }, [allocatedPhones, isLoaded]);
+
+  // Save agents to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('agentDetails', JSON.stringify(agents));
+    }
+  }, [agents, isLoaded]);
+
+  // All phones in inventory
+  const allInventoryPhones: IndividualPhoneAllocation[] = [
     {
       id: 'phone-4',
       agentId: '',
@@ -91,7 +140,55 @@ export default function AgentAllocationManager() {
       status: 'in-stock',
       dateAllocated: '',
     },
+    {
+      id: 'phone-6',
+      agentId: '',
+      phoneId: 'phone-6',
+      model: 'Samsung Galaxy A16 5G',
+      imei: '359072080276527',
+      serialNumber: 'RF9DL1A20GZ',
+      condition: 'new',
+      status: 'in-stock',
+      dateAllocated: '',
+    },
+    {
+      id: 'phone-7',
+      agentId: '',
+      phoneId: 'phone-7',
+      model: 'Samsung Galaxy A26 5G',
+      imei: '359072080276528',
+      serialNumber: 'RF9DL1A20HA',
+      condition: 'new',
+      status: 'in-stock',
+      dateAllocated: '',
+    },
+    {
+      id: 'phone-8',
+      agentId: '',
+      phoneId: 'phone-8',
+      model: 'Samsung Galaxy A36 5G',
+      imei: '359072080276529',
+      serialNumber: 'RF9DL1A20HB',
+      condition: 'refurbished',
+      status: 'in-stock',
+      dateAllocated: '',
+    },
   ];
+
+  // Calculate available phones (not yet allocated)
+  const availablePhones = allInventoryPhones.filter(
+    (phone) => !allocatedPhones.some((alloc) => alloc.phoneId === phone.phoneId)
+  );
+
+  // Filter agents based on search query
+  const filteredAgents = agents.filter((agent) => {
+    const searchLower = agentSearchQuery.toLowerCase();
+    return (
+      agent.name.toLowerCase().includes(searchLower) ||
+      agent.phone.includes(agentSearchQuery) ||
+      agent.location.toLowerCase().includes(searchLower)
+    );
+  });
 
   const getAgentPhones = (agentId: string) => {
     return allocatedPhones.filter((p) => p.agentId === agentId);
@@ -124,18 +221,30 @@ export default function AgentAllocationManager() {
     }
 
     const phoneToAllocate = availablePhones.find((p) => p.imei === selectedPhoneImei);
-    if (phoneToAllocate) {
-      const newAllocation: IndividualPhoneAllocation = {
-        ...phoneToAllocate,
-        agentId: selectedAgent,
-        dateAllocated: new Date().toISOString(),
-      };
-      setAllocatedPhones([...allocatedPhones, newAllocation]);
-      setSelectedAgent('');
-      setSelectedPhoneImei('');
-      setShowAllocationForm(false);
-      alert('✅ Phone allocated successfully!');
+    if (!phoneToAllocate) {
+      alert('Phone is no longer available or already allocated');
+      return;
     }
+
+    const selectedAgentName = agents.find((a) => a.id === selectedAgent)?.name || 'Agent';
+    const newAllocation: IndividualPhoneAllocation = {
+      ...phoneToAllocate,
+      agentId: selectedAgent,
+      dateAllocated: new Date().toISOString(),
+    };
+    setAllocatedPhones([...allocatedPhones, newAllocation]);
+
+    // Add notification
+    addNotification({
+      type: 'phone_allocated',
+      agentName: selectedAgentName,
+      phoneModel: phoneToAllocate.model,
+    });
+
+    setSelectedAgent('');
+    setSelectedPhoneImei('');
+    setShowAllocationForm(false);
+    showToast(`${phoneToAllocate.model} allocated to ${selectedAgentName}`, 'success');
   };
 
   const handleEditAgent = (agent: typeof SALES_AGENTS[0]) => {
@@ -152,13 +261,24 @@ export default function AgentAllocationManager() {
     }
     setIsEditingAgent(false);
     setEditedAgent(null);
-    alert('✅ Agent details updated successfully!');
+    showToast('Agent details updated successfully', 'success');
   };
 
   const handleRemovePhoneFromAgent = (phoneId: string) => {
     setAllocatedPhones(allocatedPhones.filter((p) => p.id !== phoneId));
-    alert('✅ Phone removed from agent!');
+    showToast('Phone removed from agent', 'success');
   };
+
+  // Wait for data to load from localStorage before rendering
+  if (!isLoaded) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <p className="text-gray-600">Loading agent data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -177,23 +297,41 @@ export default function AgentAllocationManager() {
       </div>
 
       {/* Allocation Form Modal */}
-      <Modal isOpen={showAllocationForm} onClose={() => setShowAllocationForm(false)} title="Allocate Phone to Agent">
+      <Modal isOpen={showAllocationForm} onClose={() => {
+        setShowAllocationForm(false);
+        setAgentSearchQuery('');
+        setSelectedAgent('');
+      }} title="Allocate Phone to Agent">
         <form onSubmit={handleAllocate} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Sales Agent *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Sales Agent * (Search or Select)</label>
+            <input
+              type="text"
+              placeholder="Search by name, phone, or location..."
+              value={agentSearchQuery}
+              onChange={(e) => setAgentSearchQuery(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mb-2"
+            />
             <select
               value={selectedAgent}
               onChange={(e) => setSelectedAgent(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               required
             >
-              <option value="">Select an agent...</option>
-              {agents.map((agent) => (
+              <option value="">
+                {agentSearchQuery
+                  ? `Select from ${filteredAgents.length} result${filteredAgents.length !== 1 ? 's' : ''}...`
+                  : 'Select an agent...'}
+              </option>
+              {filteredAgents.map((agent) => (
                 <option key={agent.id} value={agent.id}>
-                  {agent.name} ({agent.location})
+                  {agent.name} ({agent.location}) - {agent.phone}
                 </option>
               ))}
             </select>
+            {agentSearchQuery && filteredAgents.length === 0 && (
+              <p className="text-yellow-600 text-xs mt-2">⚠️ No agents match your search</p>
+            )}
           </div>
 
           <div>
@@ -302,22 +440,51 @@ export default function AgentAllocationManager() {
         })}
       </div>
 
+      {/* Inventory Summary */}
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow text-white p-6">
+        <h3 className="text-lg font-bold mb-4">📦 Inventory Summary</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p className="text-sm opacity-90">Total Inventory</p>
+            <p className="text-3xl font-bold">{allInventoryPhones.length}</p>
+          </div>
+          <div>
+            <p className="text-sm opacity-90">Available (Unallocated)</p>
+            <p className="text-3xl font-bold text-green-300">{availablePhones.length}</p>
+          </div>
+          <div>
+            <p className="text-sm opacity-90">Allocated to Agents</p>
+            <p className="text-3xl font-bold text-amber-300">{allocatedPhones.length}</p>
+          </div>
+          <div>
+            <p className="text-sm opacity-90">Allocation Rate</p>
+            <p className="text-3xl font-bold">
+              {allInventoryPhones.length > 0
+                ? Math.round((allocatedPhones.length / allInventoryPhones.length) * 100)
+                : 0}%
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Summary Stats */}
       <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg shadow text-white p-6">
-        <h3 className="text-lg font-bold mb-4">Overall Team Performance</h3>
+        <h3 className="text-lg font-bold mb-4">👥 Overall Team Performance</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <p className="text-sm opacity-90">Total Agents</p>
             <p className="text-3xl font-bold">{agents.length}</p>
           </div>
           <div>
-            <p className="text-sm opacity-90">Total Allocated</p>
-            <p className="text-3xl font-bold">{allocatedPhones.length}</p>
-          </div>
-          <div>
             <p className="text-sm opacity-90">Total Sold</p>
             <p className="text-3xl font-bold">
               {allocatedPhones.filter((p) => p.status === 'sold').length}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm opacity-90">In Stock with Agents</p>
+            <p className="text-3xl font-bold">
+              {allocatedPhones.filter((p) => p.status === 'in-stock').length}
             </p>
           </div>
           <div>
@@ -557,8 +724,16 @@ export default function AgentAllocationManager() {
                             dateAllocated: new Date().toISOString(),
                           };
                           setAllocatedPhones([...allocatedPhones, newAllocation]);
+
+                          // Add notification
+                          addNotification({
+                            type: 'phone_allocated',
+                            agentName: detailModalAgent.name,
+                            phoneModel: phoneToAllocate.model,
+                          });
+
                           setSelectedPhoneImei('');
-                          alert('✅ Phone assigned to agent!');
+                          showToast(`Phone assigned to ${detailModalAgent.name}`, 'success');
                         }
                       }}
                       className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium"
