@@ -145,11 +145,10 @@ export default function Notifications({ isOpen, onClose }: NotificationsProps) {
                 {recentNotifications.map((notification) => (
                   <div
                     key={notification.id}
-                    onClick={() => markAsRead(notification.id)}
-                    className={`rounded-lg border p-4 cursor-pointer transition ${
+                    className={`rounded-lg border p-4 transition ${
                       notification.read
                         ? `${getNotificationColor(notification.type)} opacity-60`
-                        : `${getNotificationColor(notification.type)} hover:shadow-md`
+                        : `${getNotificationColor(notification.type)}`
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -162,6 +161,23 @@ export default function Notifications({ isOpen, onClose }: NotificationsProps) {
                       </div>
                       {!notification.read && (
                         <div className="w-2 h-2 rounded-full bg-blue-600 flex-shrink-0 mt-1.5"></div>
+                      )}
+                    </div>
+
+                    {/* Mark as Read Button */}
+                    <div className="mt-3 flex gap-2">
+                      {!notification.read && (
+                        <button
+                          onClick={() => markAsRead(notification.id)}
+                          className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded transition font-medium"
+                        >
+                          ✓ Mark as Read
+                        </button>
+                      )}
+                      {notification.read && (
+                        <span className="px-3 py-1 text-xs bg-gray-300 text-gray-600 rounded font-medium">
+                          ✓ Read
+                        </span>
                       )}
                     </div>
                   </div>
