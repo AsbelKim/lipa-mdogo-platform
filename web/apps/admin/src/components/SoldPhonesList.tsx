@@ -3,6 +3,14 @@
 import { useState } from 'react';
 import Modal from './Modal';
 
+interface Payment {
+  date: string;
+  amount: number;
+  method: 'cash' | 'mpesa' | 'bank_transfer';
+  transactionRef: string;
+  status: 'completed' | 'pending' | 'failed';
+}
+
 interface SoldPhone {
   id: string;
   imei: string;
@@ -27,6 +35,8 @@ interface SoldPhone {
   paymentMethod: 'cash' | 'mpesa' | 'bank_transfer';
   installmentMonths: number;
   monthlyPayment: number;
+  payments: Payment[];
+  totalPaidAmount: number;
 }
 
 export default function SoldPhonesList() {
@@ -61,6 +71,12 @@ export default function SoldPhonesList() {
       paymentMethod: 'mpesa',
       installmentMonths: 12,
       monthlyPayment: 1500,
+      payments: [
+        { date: '2026-08-10', amount: 1500, method: 'mpesa', transactionRef: 'TXN001', status: 'completed' },
+        { date: '2026-08-24', amount: 1500, method: 'mpesa', transactionRef: 'TXN002', status: 'completed' },
+        { date: '2026-09-07', amount: 1500, method: 'mpesa', transactionRef: 'TXN003', status: 'completed' },
+      ],
+      totalPaidAmount: 4500,
     },
     {
       id: 'sale-2',
@@ -86,6 +102,11 @@ export default function SoldPhonesList() {
       paymentMethod: 'bank_transfer',
       installmentMonths: 18,
       monthlyPayment: 1200,
+      payments: [
+        { date: '2026-08-09', amount: 1200, method: 'bank_transfer', transactionRef: 'BK001', status: 'completed' },
+        { date: '2026-08-23', amount: 1200, method: 'bank_transfer', transactionRef: 'BK002', status: 'completed' },
+      ],
+      totalPaidAmount: 2400,
     },
     {
       id: 'sale-3',
@@ -111,6 +132,12 @@ export default function SoldPhonesList() {
       paymentMethod: 'cash',
       installmentMonths: 24,
       monthlyPayment: 1150,
+      payments: [
+        { date: '2026-08-08', amount: 1150, method: 'cash', transactionRef: 'CSH001', status: 'completed' },
+        { date: '2026-08-22', amount: 1150, method: 'cash', transactionRef: 'CSH002', status: 'completed' },
+        { date: '2026-09-05', amount: 1150, method: 'cash', transactionRef: 'CSH003', status: 'completed' },
+      ],
+      totalPaidAmount: 3450,
     },
     {
       id: 'sale-4',
@@ -136,6 +163,11 @@ export default function SoldPhonesList() {
       paymentMethod: 'mpesa',
       installmentMonths: 12,
       monthlyPayment: 1500,
+      payments: [
+        { date: '2026-08-07', amount: 1500, method: 'mpesa', transactionRef: 'TXN004', status: 'completed' },
+        { date: '2026-08-21', amount: 1500, method: 'mpesa', transactionRef: 'TXN005', status: 'completed' },
+      ],
+      totalPaidAmount: 3000,
     },
     {
       id: 'sale-5',
@@ -161,6 +193,12 @@ export default function SoldPhonesList() {
       paymentMethod: 'mpesa',
       installmentMonths: 20,
       monthlyPayment: 1600,
+      payments: [
+        { date: '2026-08-06', amount: 1600, method: 'mpesa', transactionRef: 'TXN006', status: 'completed' },
+        { date: '2026-08-20', amount: 1600, method: 'mpesa', transactionRef: 'TXN007', status: 'completed' },
+        { date: '2026-09-03', amount: 1600, method: 'mpesa', transactionRef: 'TXN008', status: 'completed' },
+      ],
+      totalPaidAmount: 4800,
     },
   ];
 
@@ -285,56 +323,51 @@ export default function SoldPhonesList() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Customer</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Phone Model</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">IMEI</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Agent</th>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Sale Price</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Payment</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Installment</th>
+                <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Total Paid</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Last Payment Date</th>
+                <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Last Amount</th>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredPhones.map((phone) => (
-                <tr key={phone.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900">{formatDate(phone.soldDate)}</td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm">
-                      <p className="font-medium text-gray-900">{phone.customer.name}</p>
-                      <p className="text-gray-600">{phone.customer.phone}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{phone.model}</td>
-                  <td className="px-6 py-4 text-sm font-mono text-gray-600">{phone.imei}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{phone.agent.name}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-right text-gray-900">
-                    {formatCurrency(phone.salePrice)}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        phone.paymentMethod === 'mpesa'
-                          ? 'bg-blue-100 text-blue-800'
-                          : phone.paymentMethod === 'cash'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-purple-100 text-purple-800'
-                      }`}
-                    >
-                      {phone.paymentMethod === 'mpesa' ? 'M-Pesa' : phone.paymentMethod === 'cash' ? 'Cash' : 'Bank'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center text-sm text-gray-600">
-                    {phone.installmentMonths}mo @ {formatCurrency(phone.monthlyPayment)}/mo
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm">
-                    <button
-                      onClick={() => setSelectedPhone(phone)}
-                      className="text-primary hover:underline font-medium"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredPhones.map((phone) => {
+                const lastPayment = phone.payments.length > 0 ? phone.payments[phone.payments.length - 1] : null;
+                return (
+                  <tr key={phone.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm text-gray-900">{formatDate(phone.soldDate)}</td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-900">{phone.customer.name}</p>
+                        <p className="text-gray-600">{phone.customer.phone}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{phone.model}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">{phone.agent.name}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-right text-gray-900">
+                      {formatCurrency(phone.salePrice)}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-semibold text-right text-green-600">
+                      {formatCurrency(phone.totalPaidAmount)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {lastPayment ? formatDate(lastPayment.date) : 'No payment'}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-semibold text-right text-gray-900">
+                      {lastPayment ? formatCurrency(lastPayment.amount) : '-'}
+                    </td>
+                    <td className="px-6 py-4 text-right text-sm">
+                      <button
+                        onClick={() => setSelectedPhone(phone)}
+                        className="text-primary hover:underline font-medium"
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -459,13 +492,79 @@ export default function SoldPhonesList() {
                   <p className="text-sm text-gray-600">Monthly Payment</p>
                   <p className="font-bold text-blue-600">{formatCurrency(selectedPhone.monthlyPayment)}</p>
                 </div>
-                <div className="col-span-2">
+                <div>
                   <p className="text-sm text-gray-600">Total Amount</p>
                   <p className="font-bold text-blue-600">
                     {formatCurrency(selectedPhone.monthlyPayment * selectedPhone.installmentMonths)}
                   </p>
                 </div>
+                <div>
+                  <p className="text-sm text-gray-600">Total Paid</p>
+                  <p className="font-bold text-green-600">{formatCurrency(selectedPhone.totalPaidAmount)}</p>
+                </div>
               </div>
+            </div>
+
+            {/* Payment History */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment History</h3>
+              {selectedPhone.payments.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-100 border-b border-gray-200">
+                      <tr>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-900">Date</th>
+                        <th className="px-4 py-3 text-right font-semibold text-gray-900">Amount</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-900">Method</th>
+                        <th className="px-4 py-3 text-left font-semibold text-gray-900">Reference</th>
+                        <th className="px-4 py-3 text-center font-semibold text-gray-900">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {selectedPhone.payments.map((payment, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-gray-900">{formatDate(payment.date)}</td>
+                          <td className="px-4 py-3 text-right font-semibold text-gray-900">
+                            {formatCurrency(payment.amount)}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span
+                              className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
+                                payment.method === 'mpesa'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : payment.method === 'cash'
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-purple-100 text-purple-800'
+                              }`}
+                            >
+                              {payment.method === 'mpesa' ? 'M-Pesa' : payment.method === 'cash' ? 'Cash' : 'Bank'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-600 font-mono text-xs">{payment.transactionRef}</td>
+                          <td className="px-4 py-3 text-center">
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                payment.status === 'completed'
+                                  ? 'bg-green-100 text-green-800'
+                                  : payment.status === 'pending'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {payment.status === 'completed' ? '✓' : payment.status === 'pending' ? '⏳' : '✕'}{' '}
+                              {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-600">
+                  No payments recorded yet
+                </div>
+              )}
             </div>
           </div>
         </Modal>
