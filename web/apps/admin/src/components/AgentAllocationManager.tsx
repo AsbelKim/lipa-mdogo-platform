@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SALES_AGENTS } from '../types/agents';
 import Modal from './Modal';
 
@@ -27,45 +27,10 @@ export default function AgentAllocationManager() {
   const [editedAgent, setEditedAgent] = useState<typeof SALES_AGENTS[0] | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<string>('');
   const [selectedPhoneImei, setSelectedPhoneImei] = useState<string>('');
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Sample allocated phones data
-  const [allocatedPhones, setAllocatedPhones] = useState<IndividualPhoneAllocation[]>([
-    {
-      id: 'alloc-1',
-      agentId: 'agent-1',
-      phoneId: 'phone-1',
-      model: 'Samsung Galaxy A56 5G',
-      imei: '359072080276522',
-      serialNumber: 'RF9DL1A20GU',
-      condition: 'new',
-      status: 'in-stock',
-      dateAllocated: new Date().toISOString(),
-    },
-    {
-      id: 'alloc-2',
-      agentId: 'agent-1',
-      phoneId: 'phone-2',
-      model: 'Samsung Galaxy A56 5G',
-      imei: '359072080276523',
-      serialNumber: 'RF9DL1A20GV',
-      condition: 'new',
-      status: 'sold',
-      dateAllocated: new Date().toISOString(),
-      dateSold: new Date().toISOString(),
-      customerName: 'John Doe',
-    },
-    {
-      id: 'alloc-3',
-      agentId: 'agent-2',
-      phoneId: 'phone-3',
-      model: 'Samsung Galaxy A36 5G',
-      imei: '359072080276524',
-      serialNumber: 'RF9DL1A20GW',
-      condition: 'refurbished',
-      status: 'in-stock',
-      dateAllocated: new Date().toISOString(),
-    },
-  ]);
+  // Sample allocated phones data with localStorage persistence
+  const [allocatedPhones, setAllocatedPhones] = useState<IndividualPhoneAllocation[]>([]);
 
   // All phones in inventory
   const allInventoryPhones: IndividualPhoneAllocation[] = [
