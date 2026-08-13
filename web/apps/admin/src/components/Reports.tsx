@@ -26,10 +26,23 @@ interface PhoneModel {
   icon: string;
 }
 
+interface Agent {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  region: string;
+  unitsSold: number;
+  revenue: number;
+  conversionRate: number;
+  icon: string;
+}
+
 export default function Reports() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<'pdf' | 'excel'>('pdf');
-  const [activeCategory, setActiveCategory] = useState<'general' | 'phone-models'>('general');
+  const [activeCategory, setActiveCategory] = useState<'general' | 'phone-models' | 'agents'>('general');
 
   const phoneModels: PhoneModel[] = [
     { id: 'a05', name: 'Samsung Galaxy A05', icon: '📱' },
@@ -39,6 +52,69 @@ export default function Reports() {
     { id: 'a26', name: 'Samsung Galaxy A26 5G', icon: '📱' },
     { id: 'a36', name: 'Samsung Galaxy A36 5G', icon: '📱' },
     { id: 'a56', name: 'Samsung Galaxy A56 5G', icon: '📱' },
+  ];
+
+  const agents: Agent[] = [
+    {
+      id: '1',
+      name: 'Michael Kipchoge',
+      email: 'michael@dakiro.co.ke',
+      phone: '+254787654321',
+      location: 'Nairobi - CBD',
+      region: 'Nairobi',
+      unitsSold: 28,
+      revenue: 245000,
+      conversionRate: 68.5,
+      icon: '👨‍💼',
+    },
+    {
+      id: '2',
+      name: 'Rose Tata',
+      email: 'rose@dakiro.co.ke',
+      phone: '+254787654322',
+      location: 'Nairobi - Westlands',
+      region: 'Nairobi',
+      unitsSold: 24,
+      revenue: 198000,
+      conversionRate: 64.3,
+      icon: '👩‍💼',
+    },
+    {
+      id: '3',
+      name: 'James Mwangi',
+      email: 'james@dakiro.co.ke',
+      phone: '+254787654323',
+      location: 'Mombasa - Kenyatta Avenue',
+      region: 'Mombasa',
+      unitsSold: 32,
+      revenue: 267000,
+      conversionRate: 71.2,
+      icon: '👨‍💼',
+    },
+    {
+      id: '4',
+      name: 'Fatima Hassan',
+      email: 'fatima@dakiro.co.ke',
+      phone: '+254787654324',
+      location: 'Mombasa - Bamburi',
+      region: 'Mombasa',
+      unitsSold: 19,
+      revenue: 145000,
+      conversionRate: 61.8,
+      icon: '👩‍💼',
+    },
+    {
+      id: '5',
+      name: 'David Kipchoge',
+      email: 'david@dakiro.co.ke',
+      phone: '+254787654325',
+      location: 'Nakuru - Town Center',
+      region: 'Nakuru',
+      unitsSold: 22,
+      revenue: 178000,
+      conversionRate: 65.2,
+      icon: '👨‍💼',
+    },
   ];
 
   const generalReports: Report[] = [
@@ -199,7 +275,7 @@ export default function Reports() {
     },
   ];
 
-  const handleDownloadReport = async (reportId: string, reportName?: string) => {
+  const handleDownloadReport = async (reportId: string, reportName?: string, reportType?: string) => {
     setIsLoading(true);
 
     try {
@@ -228,7 +304,7 @@ export default function Reports() {
         } else if (selectedFormat === 'excel') {
           generateCustomersExcel(mockCustomersData, `Customers_Report_${timestamp}`);
         }
-      } else if (reportId === 'agents') {
+      } else if (reportId === 'agents' && !reportType) {
         if (selectedFormat === 'pdf') {
           generateAgentPerformancePDF(
             mockAgentsData.map((a) => ({
@@ -250,7 +326,8 @@ export default function Reports() {
           alert('PDF export for inventory report coming soon');
         }
       } else if (reportName) {
-        alert(`📥 ${reportName} Report\n\nFormat: ${selectedFormat.toUpperCase()}\nFile: ${reportName.replace(/ /g, '_')}_Report_${timestamp}.${selectedFormat === 'pdf' ? 'pdf' : 'xlsx'}`);
+        const typeLabel = reportType === 'agent' ? 'Agent' : 'Model';
+        alert(`📥 ${reportName} ${typeLabel} Report\n\nFormat: ${selectedFormat.toUpperCase()}\n\nIncludes:\n✓ Sales/Revenue Data\n✓ Inventory Status\n✓ Customer Details\n✓ Payment Tracking\n✓ Performance Metrics\n\nFile: ${reportName.replace(/ /g, '_')}_Report_${timestamp}.${selectedFormat === 'pdf' ? 'pdf' : 'xlsx'}`);
       }
     } catch (error) {
       console.error('Error generating report:', error);
@@ -291,6 +368,16 @@ export default function Reports() {
             }`}
           >
             📱 Phone Model Reports
+          </button>
+          <button
+            onClick={() => setActiveCategory('agents')}
+            className={`px-6 py-2 rounded-lg font-medium transition ${
+              activeCategory === 'agents'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            👥 Agent Reports
           </button>
         </div>
       </div>
@@ -414,19 +501,79 @@ export default function Reports() {
       </div>
       )}
 
+      {/* Agent Reports Grid */}
+      {activeCategory === 'agents' && (
+      <div className="space-y-6">
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+          <p className="text-sm text-purple-900">
+            👥 Generate individual agent reports showing phones sold, inventory allocation, revenue, and performance metrics
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {agents.map((agent) => (
+            <div key={agent.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
+              <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-6 text-white">
+                <div className="text-4xl mb-2">{agent.icon}</div>
+                <h3 className="text-xl font-bold">{agent.name}</h3>
+                <p className="text-sm text-white/90 mt-1">{agent.location}</p>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div className="bg-gray-50 rounded p-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-gray-600">Units Sold</p>
+                    <p className="font-bold text-purple-600">{agent.unitsSold}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Revenue</p>
+                    <p className="font-bold text-green-600">KES {(agent.revenue / 1000).toFixed(0)}K</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-gray-600">Conversion Rate</p>
+                    <p className="font-bold text-blue-600">{agent.conversionRate}%</p>
+                  </div>
+                </div>
+
+                <p className="text-gray-600 text-xs">Report includes:</p>
+                <div className="bg-purple-50 rounded p-3 text-xs text-gray-700 space-y-1">
+                  <p>✓ Phones sold by this agent</p>
+                  <p>✓ Inventory allocation</p>
+                  <p>✓ Revenue generated</p>
+                  <p>✓ Customer details</p>
+                  <p>✓ Performance metrics</p>
+                  <p>✓ Payment collection</p>
+                </div>
+
+                <button
+                  onClick={() => handleDownloadReport(agent.id, agent.name, 'agent')}
+                  disabled={isLoading}
+                  className={`w-full py-2 rounded-lg font-medium transition ${
+                    isLoading
+                      ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:shadow-lg hover:scale-105'
+                  }`}
+                >
+                  {isLoading ? '⏳ Generating...' : '⬇️ Download ' + selectedFormat.toUpperCase()}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      )}
+
       {/* Info Box */}
-      {activeCategory === 'general' && (
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="font-semibold text-blue-900 mb-2">💡 Report Information</h3>
         <ul className="text-sm text-blue-800 space-y-1">
           <li>✓ All reports include current date and summary statistics</li>
           <li>✓ Data is generated fresh each time for accuracy</li>
-          <li>✓ PDF reports are formatted for printing</li>
+          <li>✓ PDF reports are formatted for printing and sharing</li>
           <li>✓ Excel reports can be further analyzed and customized</li>
-          <li>✓ Word documents are editable and can be customized</li>
+          <li>✓ {activeCategory === 'agents' ? 'Agent reports show individual performance, phones sold, and inventory' : activeCategory === 'phone-models' ? 'Phone model reports show sales by device type and customer details' : 'General reports provide company-wide overview and metrics'}</li>
         </ul>
       </div>
-      )}
     </div>
   );
 }

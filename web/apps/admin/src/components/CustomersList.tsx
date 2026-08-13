@@ -16,6 +16,7 @@ interface Customer {
   totalSpent: number;
   lastPurchaseDate?: string;
   lastPurchaseModel?: string;
+  blacklistReason?: string;
   nextOfKin: {
     fullName: string;
     phone: string;
@@ -133,10 +134,29 @@ export default function CustomersList() {
       registeredDate: '2026-06-01',
       totalPurchases: 1,
       totalSpent: 20000,
+      blacklistReason: 'Failed to complete payment installment for 3 consecutive months',
       nextOfKin: {
         fullName: 'Thomas Kamau Wanjiru',
         phone: '+254722666666',
         relationship: 'Son',
+      },
+    },
+    {
+      id: '7',
+      fullName: 'Samuel Kipchoge Mwangi',
+      nationalId: '33445566',
+      phone: '+254712345684',
+      email: 'samuel.mwangi@email.com',
+      location: 'Eldoret',
+      status: 'blacklisted',
+      registeredDate: '2026-03-15',
+      totalPurchases: 2,
+      totalSpent: 45000,
+      blacklistReason: 'Returned phone after 6 months claiming defect, fraudulent claim verified',
+      nextOfKin: {
+        fullName: 'Margaret Mwangi Kipchoge',
+        phone: '+254722777777',
+        relationship: 'Wife',
       },
     },
   ];
@@ -339,7 +359,7 @@ export default function CustomersList() {
             {/* Account Status */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
-              <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
+              <div className={`grid grid-cols-2 gap-4 rounded-lg p-4 ${selectedCustomer.status === 'blacklisted' ? 'bg-red-50 border border-red-200' : 'bg-gray-50'}`}>
                 <div>
                   <p className="text-sm text-gray-600">Status</p>
                   <span
@@ -358,6 +378,12 @@ export default function CustomersList() {
                   <p className="text-sm text-gray-600">Registered Date</p>
                   <p className="font-medium text-gray-900">{formatDate(selectedCustomer.registeredDate)}</p>
                 </div>
+                {selectedCustomer.status === 'blacklisted' && selectedCustomer.blacklistReason && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-600">Blacklist Reason</p>
+                    <p className="font-medium text-red-800 mt-1">{selectedCustomer.blacklistReason}</p>
+                  </div>
+                )}
               </div>
             </div>
 
