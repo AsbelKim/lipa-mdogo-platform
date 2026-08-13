@@ -12,6 +12,7 @@ import DevicesList from '../../components/DevicesList';
 import CustomersList from '../../components/CustomersList';
 import SoldPhonesList from '../../components/SoldPhonesList';
 import SalesAnalytics from '../../components/SalesAnalytics';
+import Reports from '../../components/Reports';
 import ChatBot from '../../components/ChatBot';
 
 export default function DashboardPage() {
@@ -66,6 +67,7 @@ export default function DashboardPage() {
             {activeTab === 'customers' && <CustomersList />}
             {activeTab === 'sold-phones' && <SoldPhonesList />}
             {activeTab === 'sales' && <SalesAnalytics />}
+            {activeTab === 'reports' && <Reports />}
           </div>
         </main>
       </div>

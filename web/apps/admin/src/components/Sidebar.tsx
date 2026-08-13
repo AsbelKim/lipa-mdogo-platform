@@ -29,6 +29,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     { id: 'customers', label: 'Customers', icon: WalletIcon },
     { id: 'sold-phones', label: 'Sold Phones', icon: ShoppingIcon },
     { id: 'sales', label: 'Sales Analytics', icon: TrendingIcon },
+    { id: 'reports', label: 'Reports & Exports', icon: TrendingIcon },
   ];
 
   return (
