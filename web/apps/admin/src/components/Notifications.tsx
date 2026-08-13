@@ -113,27 +113,11 @@ export default function Notifications({ isOpen, onClose }: NotificationsProps) {
   const recentNotifications = notifications.slice(0, 50); // Show last 50
 
   return (
-    <>
-      {/* Notification Bell Icon */}
-      <button
-        onClick={onClose}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
-        title="Notifications"
-      >
-        <span className="text-xl">🔔</span>
-        {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        )}
-      </button>
-
-      {/* Notifications Modal */}
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        title={`Notifications ${unreadCount > 0 ? `(${unreadCount} new)` : ''}`}
-      >
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Notifications ${unreadCount > 0 ? `(${unreadCount} new)` : ''}`}
+    >
         <div className="space-y-4">
           {recentNotifications.length === 0 ? (
             <div className="text-center py-8">
@@ -196,7 +180,6 @@ export default function Notifications({ isOpen, onClose }: NotificationsProps) {
           )}
         </div>
       </Modal>
-    </>
   );
 }
 
