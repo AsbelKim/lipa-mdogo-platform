@@ -26,6 +26,7 @@ export default function PendingSales() {
   const [selectedSale, setSelectedSale] = useState<PendingSale | null>(null);
   const [approvalReason, setApprovalReason] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isGeneratingNote, setIsGeneratingNote] = useState(false);
 
   // Load from localStorage
   useEffect(() => {
@@ -132,6 +133,28 @@ export default function PendingSales() {
     setSelectedSale(null);
     setApprovalReason('');
     alert('❌ Sale rejected. Agent has been notified.');
+  };
+
+  const generateThankYouNote = (sale: PendingSale) => {
+    setIsGeneratingNote(true);
+
+    // Simulate AI generating a thank you note
+    setTimeout(() => {
+      const notes = [
+        `Dear ${sale.customerName},\n\nThank you for choosing DAKIRO GENERAL ELECTRONICS for your Samsung ${sale.phoneModel.replace('Samsung ', '')}. We appreciate your business and look forward to serving you!\n\nBest regards,\nDAKIRO Team`,
+
+        `Hi ${sale.customerName},\n\nThank you for your purchase! We're delighted to have you as a DAKIRO customer. Your new ${sale.phoneModel} is now yours to enjoy.\n\nWarm regards,\nDAKIRO General Electronics`,
+
+        `Dear Valued Customer,\n\nThank you for trusting DAKIRO with your mobile device purchase. We're committed to providing excellent service throughout your installment period.\n\nBest wishes,\nDAKIRO Team`,
+
+        `Hello ${sale.customerName},\n\nWelcome to the DAKIRO family! Thank you for choosing us for your ${sale.phoneModel}. We're here to support you every step of the way.\n\nWarm regards,\nDAKIRO General Electronics Team`,
+      ];
+
+      const randomNote = notes[Math.floor(Math.random() * notes.length)];
+      setApprovalReason(randomNote);
+      setIsGeneratingNote(false);
+      alert('✅ Thank you note generated! Feel free to edit it before approval.');
+    }, 800);
   };
 
   const pendingSalesCount = sales.filter((s) => s.status === 'pending').length;
@@ -320,17 +343,30 @@ export default function PendingSales() {
               </div>
             </div>
 
-            {/* Approval Notes */}
+            {/* Approval Notes & Thank You Message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Approval/Rejection Notes (required for rejection)
-              </label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Approval Notes / Thank You Message
+                </label>
+                <button
+                  type="button"
+                  onClick={() => generateThankYouNote(selectedSale)}
+                  disabled={isGeneratingNote}
+                  className="px-3 py-1 text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 rounded transition disabled:opacity-50"
+                >
+                  {isGeneratingNote ? '⏳ Generating...' : '✨ Generate Note'}
+                </button>
+              </div>
               <textarea
                 value={approvalReason}
                 onChange={(e) => setApprovalReason(e.target.value)}
-                placeholder="Add notes about this sale..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm h-24"
+                placeholder="Click 'Generate Note' for AI-drafted thank you message, or type your own message..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm h-28"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Tip: Click 'Generate Note' to auto-draft a professional thank you message!
+              </p>
             </div>
 
             {/* Action Buttons */}
