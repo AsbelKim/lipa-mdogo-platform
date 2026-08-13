@@ -16,6 +16,7 @@ import SoldPhonesList from '../../components/SoldPhonesList';
 import SalesAnalytics from '../../components/SalesAnalytics';
 import Reports from '../../components/Reports';
 import AIAgent from '../../components/AIAgent';
+import { ToastContainer } from '../../components/Toast';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -78,6 +79,9 @@ export default function DashboardPage() {
 
       {/* AI Assistant */}
       <AIAgent />
+
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }

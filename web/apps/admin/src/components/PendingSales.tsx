@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Modal from './Modal';
 import { validationRules } from '../utils/validationHelpers';
+import { showToast } from './Toast';
 
 interface PendingSale {
   id: string;
@@ -115,7 +116,7 @@ export default function PendingSales() {
 
     setSelectedSale(null);
     setApprovalReason('');
-    alert('✅ Sale approved! Receipt generated and sent to agent.');
+    showToast('Sale approved! Receipt generated and sent to agent.', 'success');
   };
 
   const handleRejectSale = (sale: PendingSale) => {
@@ -132,7 +133,7 @@ export default function PendingSales() {
     setSales(updatedSales);
     setSelectedSale(null);
     setApprovalReason('');
-    alert('❌ Sale rejected. Agent has been notified.');
+    showToast('Sale rejected. Agent has been notified.', 'warning');
   };
 
   const generateThankYouNote = (sale: PendingSale) => {
@@ -153,7 +154,7 @@ export default function PendingSales() {
       const randomNote = notes[Math.floor(Math.random() * notes.length)];
       setApprovalReason(randomNote);
       setIsGeneratingNote(false);
-      alert('✅ Thank you note generated! Feel free to edit it before approval.');
+      showToast('Thank you note generated! Feel free to edit it before approval.', 'success');
     }, 800);
   };
 
