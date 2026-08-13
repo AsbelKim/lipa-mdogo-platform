@@ -199,7 +199,7 @@ export default function Reports() {
     },
   ];
 
-  const handleDownloadReport = async (reportId: string) => {
+  const handleDownloadReport = async (reportId: string, reportName?: string) => {
     setIsLoading(true);
 
     try {
@@ -249,6 +249,8 @@ export default function Reports() {
         } else if (selectedFormat === 'pdf') {
           alert('PDF export for inventory report coming soon');
         }
+      } else if (reportName) {
+        alert(`📥 ${reportName} Report\n\nFormat: ${selectedFormat.toUpperCase()}\nFile: ${reportName.replace(/ /g, '_')}_Report_${timestamp}.${selectedFormat === 'pdf' ? 'pdf' : 'xlsx'}`);
       }
     } catch (error) {
       console.error('Error generating report:', error);
@@ -427,15 +429,4 @@ export default function Reports() {
       )}
     </div>
   );
-
-  function handleDownloadReport(phoneModelId: string, phoneModelName: string) {
-    setIsLoading(true);
-    const timestamp = new Date().toISOString().slice(0, 10);
-
-    // Simulate download
-    setTimeout(() => {
-      alert(`📥 ${phoneModelName} Report\n\nFormat: ${selectedFormat.toUpperCase()}\nFile: ${phoneModelName.replace(/ /g, '_')}_Report_${timestamp}.${selectedFormat === 'pdf' ? 'pdf' : 'xlsx'}`);
-      setIsLoading(false);
-    }, 1500);
-  }
 }
