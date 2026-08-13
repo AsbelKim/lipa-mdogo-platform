@@ -9,8 +9,6 @@ import {
   generateCustomersExcel,
   generateAgentsExcel,
   generateInventoryExcel,
-  generateSalesWord,
-  generateCustomersWord,
 } from '../utils/exportHelpers';
 
 interface Report {
@@ -23,7 +21,7 @@ interface Report {
 
 export default function Reports() {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFormat, setSelectedFormat] = useState<'pdf' | 'excel' | 'word'>('pdf');
+  const [selectedFormat, setSelectedFormat] = useState<'pdf' | 'excel'>('pdf');
 
   const reports: Report[] = [
     {
@@ -186,8 +184,6 @@ export default function Reports() {
           generateSalesReportPDF(mockSalesData, `Sales_Report_${timestamp}`);
         } else if (selectedFormat === 'excel') {
           generateSalesExcel(mockSalesData, `Sales_Report_${timestamp}`);
-        } else if (selectedFormat === 'word') {
-          await generateSalesWord(mockSalesData, `Sales_Report_${timestamp}`);
         }
       } else if (reportId === 'customers') {
         if (selectedFormat === 'pdf') {
@@ -205,19 +201,6 @@ export default function Reports() {
           );
         } else if (selectedFormat === 'excel') {
           generateCustomersExcel(mockCustomersData, `Customers_Report_${timestamp}`);
-        } else if (selectedFormat === 'word') {
-          await generateCustomersWord(
-            mockCustomersData.map((c) => ({
-              name: c.fullName,
-              phone: c.phone,
-              email: c.email,
-              location: c.location,
-              purchases: c.purchases,
-              spent: c.totalSpent,
-              nok: c.nokName,
-            })),
-            `Customers_Report_${timestamp}`
-          );
         }
       } else if (reportId === 'agents') {
         if (selectedFormat === 'pdf') {
@@ -261,7 +244,7 @@ export default function Reports() {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Export Format</h2>
         <div className="flex gap-3 flex-wrap">
-          {(['pdf', 'excel', 'word'] as const).map((format) => (
+          {(['pdf', 'excel'] as const).map((format) => (
             <button
               key={format}
               onClick={() => setSelectedFormat(format)}
@@ -273,14 +256,12 @@ export default function Reports() {
             >
               {format === 'pdf' && '📄 PDF'}
               {format === 'excel' && '📊 Excel'}
-              {format === 'word' && '📝 Word'}
             </button>
           ))}
         </div>
         <p className="text-xs text-gray-600 mt-3">
           {selectedFormat === 'pdf' && 'Professional PDF format - Perfect for sharing and printing'}
           {selectedFormat === 'excel' && 'Excel format - Easy to analyze and manipulate data'}
-          {selectedFormat === 'word' && 'Word format - Easy to edit and customize'}
         </p>
       </div>
 
