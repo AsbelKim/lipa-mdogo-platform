@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { showToast } from '../Toast';
 
 interface CommissionRecord {
   receiptId: string;
@@ -80,6 +81,27 @@ export default function MyCommissions() {
       }
     }
     setIsLoaded(true);
+  };
+
+  const downloadReceiptPDF = async (commission: CommissionRecord) => {
+    try {
+      const { generateReceiptPDF } = await import('../../utils/pdfReceiptGenerator');
+
+      generateReceiptPDF({
+        receiptId: commission.receiptId,
+        customerName: commission.customerName,
+        customerPhone: '', // Get from requests
+        amount: commission.amount,
+        description: `Sale Transaction - ${commission.receiptId}`,
+        agentName: localStorage.getItem('agent_name') || '',
+        approvalDate: commission.date,
+      });
+
+      showToast(`Receipt ${commission.receiptId} downloaded as PDF`, 'success');
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      showToast('Failed to generate receipt PDF', 'error');
+    }
   };
 
   if (!isLoaded) {

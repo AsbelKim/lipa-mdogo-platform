@@ -137,57 +137,30 @@ export default function RequestReceipt() {
     reader.readAsDataURL(formData.screenshot!);
   };
 
-  const downloadReceipt = (receipt: ReceiptRequest) => {
+  const downloadReceipt = async (receipt: ReceiptRequest) => {
     if (!receipt.receiptId) {
       showToast('Receipt not ready yet', 'info');
       return;
     }
 
-    const receiptContent = `
-                                CASH SALE
-                    DAKIRO GENERAL ELECTRONICS
-                    P.O BOX 46, KERICHO. Tel: 0720 049 708
-                Opposite Kapsoit Guest House - Kapsoit Town
+    try {
+      const { generateReceiptPDF } = await import('../../../utils/pdfReceiptGenerator');
 
-Date: ${new Date(receipt.approvedDate || '').toLocaleDateString('en-GB')}
+      generateReceiptPDF({
+        receiptId: receipt.receiptId,
+        customerName: receipt.customerName,
+        customerPhone: receipt.customerPhone,
+        amount: receipt.amount,
+        description: receipt.description,
+        agentName: localStorage.getItem('agent_name') || '',
+        approvalDate: receipt.approvedDate || new Date().toISOString(),
+      });
 
-M/S ${receipt.customerName}
-
-Dealers in: TV's, DVD, Phone, Phone Accessories, Players, Batteries,
-            Solar Panels, Wiring Materials, D Lights, Cameras etc.
-
-┌─────┬──────────────────────────────────────┬──────────┬─────┐
-│ Qty │ Particulars                          │  Kshs.   │ Cts │
-├─────┼──────────────────────────────────────┼──────────┼─────┤
-│  1  │ ${receipt.description.padEnd(36)} │${String(receipt.amount).padStart(8)}│     │
-│     │ Customer: ${receipt.customerPhone.padEnd(24)} │          │     │
-├─────┼──────────────────────────────────────┼──────────┼─────┤
-│     │ TOTAL                                │${String(receipt.amount).padStart(8)}│     │
-└─────┴──────────────────────────────────────┴──────────┴─────┘
-
-Receipt ID: ${receipt.receiptId}
-Sales Agent: ${receipt.agentName}
-Customer Phone: ${receipt.customerPhone}
-
-═══════════════════════════════════════════════════════════════════
-                Goods once sold cannot be re-accepted
-═══════════════════════════════════════════════════════════════════
-
-Generated: ${new Date().toLocaleString()}
-    `.trim();
-
-    const element = document.createElement('a');
-    element.setAttribute(
-      'href',
-      'data:text/plain;charset=utf-8,' + encodeURIComponent(receiptContent)
-    );
-    element.setAttribute('download', `Receipt_${receipt.receiptId}_${receipt.customerName}.txt`);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-
-    showToast(`Receipt ${receipt.receiptId} downloaded`, 'success');
+      showToast(`Receipt ${receipt.receiptId} downloaded as PDF`, 'success');
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      showToast('Failed to generate receipt PDF', 'error');
+    }
   };
 
   return (

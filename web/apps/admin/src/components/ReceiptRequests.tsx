@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Modal from './Modal';
 import { showToast } from './Toast';
 import { addNotification } from './Notifications';
+import { generateReceiptPDF } from '../utils/pdfReceiptGenerator';
 
 interface ReceiptRequest {
   id: string;
@@ -43,29 +44,46 @@ export default function ReceiptRequests() {
     setIsLoaded(true);
   };
 
-  const handleGenerateReceipt = (request: ReceiptRequest) => {
+  const handleGenerateReceipt = async (request: ReceiptRequest) => {
     const receiptId = `RCP-${Date.now()}`;
+    const approvalDate = new Date().toISOString();
 
-    // Update request status
-    const updated = requests.map((r) =>
-      r.id === request.id
-        ? { ...r, status: 'ready' as const, receiptId, approvedDate: new Date().toISOString() }
-        : r
-    );
-    setRequests(updated);
-    localStorage.setItem('receiptRequests', JSON.stringify(updated));
+    try {
+      // Generate PDF
+      generateReceiptPDF({
+        receiptId,
+        customerName: request.customerName,
+        customerPhone: request.customerPhone,
+        amount: request.amount,
+        description: request.description,
+        agentName: request.agentName,
+        approvalDate,
+      });
 
-    // Add notification to agent
-    addNotification({
-      type: 'receipt_sent',
-      agentName: request.agentName,
-      customerName: request.customerName,
-      receiptId,
-    });
+      // Update request status
+      const updated = requests.map((r) =>
+        r.id === request.id
+          ? { ...r, status: 'ready' as const, receiptId, approvedDate }
+          : r
+      );
+      setRequests(updated);
+      localStorage.setItem('receiptRequests', JSON.stringify(updated));
 
-    setSelectedRequest(null);
-    setShowModal(false);
-    showToast(`Receipt ${receiptId} generated and sent to agent!`, 'success');
+      // Add notification to agent
+      addNotification({
+        type: 'receipt_sent',
+        agentName: request.agentName,
+        customerName: request.customerName,
+        receiptId,
+      });
+
+      setSelectedRequest(null);
+      setShowModal(false);
+      showToast(`Receipt ${receiptId} generated as PDF and sent to agent!`, 'success');
+    } catch (error) {
+      console.error('Failed to generate receipt:', error);
+      showToast('Failed to generate receipt PDF', 'error');
+    }
   };
 
   const handleRejectRequest = (request: ReceiptRequest) => {
