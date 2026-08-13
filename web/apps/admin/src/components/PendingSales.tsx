@@ -28,6 +28,9 @@ export default function PendingSales() {
   const [approvalReason, setApprovalReason] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGeneratingNote, setIsGeneratingNote] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [rejectingSale, setRejectingSale] = useState<PendingSale | null>(null);
 
   // Load from localStorage
   useEffect(() => {
@@ -114,26 +117,62 @@ export default function PendingSales() {
     const soldPhones = existingSoldPhones ? JSON.parse(existingSoldPhones) : [];
     localStorage.setItem('soldPhones', JSON.stringify([...soldPhones, soldPhone]));
 
+    // Add notification
+    const notification = {
+      id: Date.now().toString(),
+      type: 'sale_approved',
+      agentName: sale.agentName,
+      customerName: sale.customerName,
+      phoneModel: sale.phoneModel,
+      receiptId: soldPhone.receiptId,
+      timestamp: new Date().toISOString(),
+    };
+    const existingNotifications = localStorage.getItem('adminNotifications');
+    const notifications = existingNotifications ? JSON.parse(existingNotifications) : [];
+    localStorage.setItem('adminNotifications', JSON.stringify([notification, ...notifications]));
+
     setSelectedSale(null);
     setApprovalReason('');
     showToast('Sale approved! Receipt generated and sent to agent.', 'success');
   };
 
   const handleRejectSale = (sale: PendingSale) => {
-    if (!approvalReason.trim()) {
-      alert('Please provide a reason for rejection');
+    setRejectingSale(sale);
+    setShowRejectModal(true);
+  };
+
+  const confirmRejectSale = () => {
+    if (!rejectionReason.trim()) {
+      showToast('Please provide a rejection reason', 'error');
       return;
     }
 
     const updatedSales = sales.map((s) =>
-      s.id === sale.id
-        ? { ...s, status: 'rejected' as const, notes: approvalReason }
+      s.id === rejectingSale?.id
+        ? { ...s, status: 'rejected' as const, notes: rejectionReason }
         : s
     );
     setSales(updatedSales);
+
+    // Add notification
+    const notification = {
+      id: Date.now().toString(),
+      type: 'sale_rejected',
+      agentName: rejectingSale?.agentName,
+      customerName: rejectingSale?.customerName,
+      reason: rejectionReason,
+      timestamp: new Date().toISOString(),
+    };
+    const existingNotifications = localStorage.getItem('adminNotifications');
+    const notifications = existingNotifications ? JSON.parse(existingNotifications) : [];
+    localStorage.setItem('adminNotifications', JSON.stringify([notification, ...notifications]));
+
     setSelectedSale(null);
     setApprovalReason('');
-    showToast('Sale rejected. Agent has been notified.', 'warning');
+    setShowRejectModal(false);
+    setRejectingSale(null);
+    setRejectionReason('');
+    showToast(`Sale rejected. Reason: ${rejectionReason}`, 'warning');
   };
 
   const generateThankYouNote = (sale: PendingSale) => {
