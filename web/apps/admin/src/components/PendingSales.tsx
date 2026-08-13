@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Modal from './Modal';
 import { validationRules } from '../utils/validationHelpers';
 import { showToast } from './Toast';
+import { addNotification } from './Notifications';
 
 interface PendingSale {
   id: string;
@@ -118,18 +119,13 @@ export default function PendingSales() {
     localStorage.setItem('soldPhones', JSON.stringify([...soldPhones, soldPhone]));
 
     // Add notification
-    const notification = {
-      id: Date.now().toString(),
+    addNotification({
       type: 'sale_approved',
       agentName: sale.agentName,
       customerName: sale.customerName,
       phoneModel: sale.phoneModel,
       receiptId: soldPhone.receiptId,
-      timestamp: new Date().toISOString(),
-    };
-    const existingNotifications = localStorage.getItem('adminNotifications');
-    const notifications = existingNotifications ? JSON.parse(existingNotifications) : [];
-    localStorage.setItem('adminNotifications', JSON.stringify([notification, ...notifications]));
+    });
 
     setSelectedSale(null);
     setApprovalReason('');
@@ -155,17 +151,12 @@ export default function PendingSales() {
     setSales(updatedSales);
 
     // Add notification
-    const notification = {
-      id: Date.now().toString(),
+    addNotification({
       type: 'sale_rejected',
       agentName: rejectingSale?.agentName,
       customerName: rejectingSale?.customerName,
       reason: rejectionReason,
-      timestamp: new Date().toISOString(),
-    };
-    const existingNotifications = localStorage.getItem('adminNotifications');
-    const notifications = existingNotifications ? JSON.parse(existingNotifications) : [];
-    localStorage.setItem('adminNotifications', JSON.stringify([notification, ...notifications]));
+    });
 
     setSelectedSale(null);
     setApprovalReason('');
@@ -305,6 +296,86 @@ export default function PendingSales() {
         )}
       </div>
 
+      {/* Rejection Reason Modal */}
+      {showRejectModal && rejectingSale && (
+        <Modal
+          isOpen={showRejectModal}
+          onClose={() => {
+            setShowRejectModal(false);
+            setRejectingSale(null);
+            setRejectionReason('');
+          }}
+          title="Reject Sale - Provide Reason"
+        >
+          <div className="space-y-4">
+            <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+              <p className="text-sm font-medium text-red-900">Sale Details</p>
+              <p className="text-gray-700 font-semibold mt-1">{rejectingSale.customerName}</p>
+              <p className="text-sm text-gray-600">{rejectingSale.phoneModel} • Agent: {rejectingSale.agentName}</p>
+            </div>
+
+            {/* Rejection Reason Presets */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Quick Reasons</label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  'Customer not approved / credit check failed',
+                  'Payment method not accepted',
+                  'Device stock unavailable',
+                  'Customer already has pending sale',
+                  'IMEI already registered to another customer',
+                  'Device reported as stolen/blacklisted',
+                ].map((reason) => (
+                  <button
+                    key={reason}
+                    type="button"
+                    onClick={() => setRejectionReason(reason)}
+                    className={`text-left px-3 py-2 rounded-lg border transition ${
+                      rejectionReason === reason
+                        ? 'bg-red-100 border-red-400 text-red-900 font-medium'
+                        : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    {reason}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom Reason */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Or Provide Custom Reason</label>
+              <textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Explain why this sale is being rejected..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm h-20"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={confirmRejectSale}
+                className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-bold"
+              >
+                ✓ Confirm Rejection
+              </button>
+              <button
+                onClick={() => {
+                  setShowRejectModal(false);
+                  setRejectingSale(null);
+                  setRejectionReason('');
+                }}
+                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {/* Approval Modal */}
       {selectedSale && (
         <Modal
@@ -418,7 +489,10 @@ export default function PendingSales() {
                 ✓ Approve Sale & Generate Receipt
               </button>
               <button
-                onClick={() => handleRejectSale(selectedSale)}
+                onClick={() => {
+                  setRejectingSale(selectedSale);
+                  setShowRejectModal(true);
+                }}
                 className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-bold"
               >
                 ✕ Reject Sale

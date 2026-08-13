@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { SALES_AGENTS } from '../types/agents';
 import Modal from './Modal';
+import { addNotification } from './Notifications';
+import { showToast } from './Toast';
 
 interface IndividualPhoneAllocation {
   id: string;
@@ -231,10 +233,18 @@ export default function AgentAllocationManager() {
       dateAllocated: new Date().toISOString(),
     };
     setAllocatedPhones([...allocatedPhones, newAllocation]);
+
+    // Add notification
+    addNotification({
+      type: 'phone_allocated',
+      agentName: selectedAgentName,
+      phoneModel: phoneToAllocate.model,
+    });
+
     setSelectedAgent('');
     setSelectedPhoneImei('');
     setShowAllocationForm(false);
-    alert(`✅ ${phoneToAllocate.model} allocated to ${selectedAgentName}!\n\nIMEI: ${phoneToAllocate.imei}`);
+    showToast(`${phoneToAllocate.model} allocated to ${selectedAgentName}`, 'success');
   };
 
   const handleEditAgent = (agent: typeof SALES_AGENTS[0]) => {
@@ -251,12 +261,12 @@ export default function AgentAllocationManager() {
     }
     setIsEditingAgent(false);
     setEditedAgent(null);
-    alert('✅ Agent details updated successfully!');
+    showToast('Agent details updated successfully', 'success');
   };
 
   const handleRemovePhoneFromAgent = (phoneId: string) => {
     setAllocatedPhones(allocatedPhones.filter((p) => p.id !== phoneId));
-    alert('✅ Phone removed from agent!');
+    showToast('Phone removed from agent', 'success');
   };
 
   // Wait for data to load from localStorage before rendering
@@ -714,8 +724,16 @@ export default function AgentAllocationManager() {
                             dateAllocated: new Date().toISOString(),
                           };
                           setAllocatedPhones([...allocatedPhones, newAllocation]);
+
+                          // Add notification
+                          addNotification({
+                            type: 'phone_allocated',
+                            agentName: detailModalAgent.name,
+                            phoneModel: phoneToAllocate.model,
+                          });
+
                           setSelectedPhoneImei('');
-                          alert('✅ Phone assigned to agent!');
+                          showToast(`Phone assigned to ${detailModalAgent.name}`, 'success');
                         }
                       }}
                       className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium"
