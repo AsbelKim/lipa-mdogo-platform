@@ -1,14 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Icon } from './Icons';
-
-// Import icons - create a simple chat icon
-const ChatIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-  </svg>
-);
 
 interface ChatMessage {
   id: string;
@@ -27,7 +19,7 @@ export default function SalesAssistant({ agentId, agentName }: SalesAssistantPro
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      text: `Hi ${agentName || 'there'}! 👋 I'm your Sales Assistant. I can help you with sales tips, customer communication, calculations, and more. What do you need help with?`,
+      text: `Hi ${agentName || 'Agent'}! 👋 I'm your Sales Assistant. Ask me about sales tips, customer scripts, commission calculations, lead strategies, and more!`,
       sender: 'bot',
       timestamp: new Date(),
     },
@@ -52,257 +44,97 @@ export default function SalesAssistant({ agentId, agentName }: SalesAssistantPro
     'Financing terms',
   ];
 
-  // Comprehensive sales knowledge base
   const salesKnowledge: Record<string, string> = {
-    'sales tips': `🎯 **Top Sales Tips for Success:**
+    'sales tips': `🎯 **Top Sales Tips:**
 
-1. **Build Rapport First**
-   - Start with genuine conversation
-   - Ask about their needs before selling
-   - Listen more than you talk
+1. **Build Rapport** - Start with genuine conversation
+2. **Benefits Over Features** - Don't say "12-month plan", say "Only KES 4,167/month for a new phone"
+3. **3-Tier Approach** - Budget (low), Popular (mid), Premium (high)
+4. **Handle Objections** - Turn "I can't afford" into "What payment works for you?"
+5. **Close with Confidence** - Assume the sale and move forward
 
-2. **Present Benefits, Not Features**
-   - Don't just say "12-month financing"
-   - Say "Get your phone NOW, pay just KES 4,167/month"
-   - Focus on customer's need to own device immediately
+💡 Most customers buy the middle option!`,
 
-3. **Use the 3-Tier Approach**
-   - Budget Option: Small device, lower payment
-   - Popular Option: Mid-range, proven model
-   - Premium Option: Latest tech, if customer can afford
-   - Most people choose middle option!
+    'customer scripts': `📝 **Ready-to-Use Scripts:**
 
-4. **Handle Objections Positively**
-   - "I can't afford it" → "What monthly payment works for you?"
-   - "Let me think" → "Perfect! When should I follow up?"
-   - "Too expensive" → "Compared to what? What's your budget?"
+**Opening:** "Hi! I help people own the latest phones without paying everything upfront. What's your budget?"
 
-5. **Close with Confidence**
-   - "Shall we start with the iPhone 12 then?"
-   - "Let's get your papers signed today"
-   - Assume the sale and move forward
+**Value Prop:** "Instead of saving 6 months, own it TODAY and pay just KES 4,167/month for 12 months!"
 
-💡 **Bonus Tip:** Track which device sells best in your area and push that first!`,
+**Objection:** "Price matters, that's smart! But think of it like 2 cups of coffee daily. Most people earn that selling ONE phone."
 
-    'customer scripts': `📝 **Ready-to-Use Sales Scripts:**
+**Closing:** "Let's get started! I need your ID and phone number."
 
-**Opening (First 30 seconds):**
-"Hi! Thanks for stopping by. I help people own the latest phones without paying everything upfront. Are you looking for a smartphone right now? What's your budget?"
+✨ Adapt to each customer - don't sound like a robot!`,
 
-**Value Proposition:**
-"Instead of saving for 6 months, you can own it TODAY and spread payments over 12 months. Just KES 4,167 per month for a brand new device."
+    'commission calc': `💰 **Your Commissions:**
 
-**Handling "Too Expensive":**
-"Think of it this way - that's the price of 2 cups of coffee per day. Most people earn that in sales of just ONE phone. Makes sense?"
+12% of EVERY sale!
 
-**Building Urgency:**
-"I have 3 iPhone 12s in stock, and they move fast. Should I set one aside for you while you think about it?"
+Examples:
+- KES 25,000 sale = KES 3,000 commission
+- KES 50,000 sale = KES 6,000 commission
+- KES 75,000 sale = KES 9,000 commission
+- KES 100,000 sale = KES 12,000 commission
 
-**Closing (Assumptive):**
-"Perfect! Let's get started. First, I need your ID and phone number. Do you prefer M-Pesa or cash for the deposit?"
+**Monthly Target:** KES 500,000
+→ That's KES 60,000 commission!
 
-**Follow-up (After no sale):**
-"No problem! Here's my number - when you're ready, just text me. I promise to find you the best deal in town."
+5 sales × KES 50k = KES 30,000 commission
+10 sales × KES 30k = KES 36,000 commission
 
-✨ **Key:** Sound genuine, not scripted. Adapt to each customer!`,
+Track your earnings in the Earnings tab!`,
 
-    'commission calc': `💰 **Commission Calculation Guide:**
+    'lead strategies': `🎯 **How to Find Leads:**
 
-**Your Commission Rate:** 12% of every sale
+**Best Places:**
+- Market centers & shops
+- Office buildings & companies
+- Referrals from existing customers
+- WhatsApp status updates
+- Friends & family
 
-**Quick Examples:**
+**Quick Qualification:**
+- What's your budget?
+- Do you need it for personal or resale?
+- When do you need it?
 
-Phone Price    | Monthly Payment | Your Commission
-KES 25,000     | KES 2,083 (12mo)| KES 3,000
-KES 50,000     | KES 4,167 (12mo)| KES 6,000
-KES 75,000     | KES 6,250 (12mo)| KES 9,000
-KES 100,000    | KES 8,333 (12mo)| KES 12,000
+Budget + Need = READY TO SELL!
 
-**Monthly Target:** KES 500,000 in sales
-→ Earns you: **KES 60,000** in commission!
+**Speed Matters:**
+Close the sale within 24 hours!`,
 
-**Formula:** Sale Amount × 0.12 = Your Commission
+    'financing terms': `📋 **Hire Purchase Explained:**
 
-**Pro Tip:**
-- 5 × KES 50k sales = KES 30,000 commission
-- 10 × KES 30k sales = KES 36,000 commission
-- Mix sizes, prioritize volume!
+**How it works:**
+1. Customer pays deposit (20-30%)
+2. Then pays monthly installment
+3. After final payment = owns the phone
 
-📊 **Track in Earnings Dashboard** to watch your commission grow in real-time!`,
+**Example: KES 50,000 iPhone**
+- Down payment: KES 10,000 (today)
+- Monthly: KES 4,167 × 12 months
+- Total cost: KES 60,000
 
-    'lead strategies': `🎯 **Lead Generation & Conversion Strategies:**
+**Tell customers:**
+"No interest, just a convenient payment plan"
+"Only KES 4,167/month for a brand new iPhone"
+"It's safe for both of us"`,
 
-**Where to Find Leads:**
+    'motivation': `💪 **You've Got This!**
 
-1. **Location-Based**
-   - Visit market centers, shopping areas
-   - Talk to shop owners, traders
-   - They need phones for inventory
-   - High-value customers!
+Remember:
+✨ Each sale = KES 6,000+ commission
+✨ You control your earnings
+✨ Next customer could be your biggest sale
+✨ Hit monthly target = KES 60,000!
 
-2. **Personal Network**
-   - Friends & family (free leads!)
-   - Ask existing customers for referrals
-   - "Do you know 3 people who'd love a new phone?"
-   - Referral incentive: "I'll give you credit for next purchase"
+Affirmations:
+"I am a great salesman"
+"My customers love me"
+"I will hit my target this month"
 
-3. **Workplace Visits**
-   - Talk to companies, offices, schools
-   - Bulk deals for employees
-   - Stable income = good credit
-
-4. **WhatsApp Status**
-   - Post attractive phone pics with price
-   - Update daily with new deals
-   - "Available Today" angle
-   - Use emojis and clear call-to-action
-
-**Conversion Tips:**
-
-✅ **First Contact to Sale: 24 hours**
-- Don't wait, momentum matters
-- "Can I stop by tomorrow at 2pm?"
-
-✅ **Qualify Fast**
-- Budget? (Price range they want)
-- Need? (Personal or resale)
-- Timeline? (Today or next month)
-- Budget + Need = SELL
-
-✅ **Use Social Proof**
-- "I sold 3 of these this week"
-- Show happy customer feedback
-- "They love it!"
-
-**Monthly Target Breakdown:**
-- 10 sales × KES 50k = KES 500k (target reached!)
-- 2 sales/week is achievable
-- You got this! 💪`,
-
-    'financing terms': `📋 **Financing Terms Explained (For You & Customers):**
-
-**What is Hire Purchase?**
-- Customer pays deposit (down payment)
-- Then pays monthly installment
-- After final payment, owns the phone
-- It's safe for both sides
-
-**Key Terms:**
-
-**Down Payment (Deposit)**
-- Usually 20-30% of phone price
-- Customer pays TODAY
-- Shows commitment
-- Protects company from default
-
-**Monthly Installment**
-- Fixed amount customer pays monthly
-- Same amount every month
-- For 6, 12, 18, 24, or 36 months
-- Simple to track and calculate
-
-**Interest (Hidden in financing)**
-- Already built into our pricing
-- Customer doesn't pay extra interest
-- More months = slightly higher total
-- Still affordable!
-
-**Example Breakdown:**
-```
-iPhone 12 Sale Price: KES 50,000
-Down Payment (20%): KES 10,000 [Customer pays today]
-Remaining Balance: KES 40,000
-Duration: 12 months
-Monthly Installment: KES 4,167 × 12 = KES 50,000
-
-Total Cost: KES 10,000 + KES 50,000 = KES 60,000
-Markup: KES 10,000 (20%)
-```
-
-**Talking Points for Customers:**
-- "No interest, just a convenient payment plan"
-- "Spread the cost over 12 months"
-- "Only KES 4,167 per month for a brand new iPhone!"
-- "Safe for both of us - we trust you to pay"
-
-**Your Earnings:**
-- Commission on full sale price (KES 50,000)
-- 12% = KES 6,000 (paid once deal closes)`,
-
-    'handling objections': `🛡️ **Handling Common Objections:**
-
-**"The phone is too expensive"**
-❌ Don't: "No it's not, it's a good price"
-✅ Do: "Which price range works better for you? Maybe the Samsung at KES 35k?"
-
-**"Let me think about it"**
-❌ Don't: "Sure, call me later"
-✅ Do: "I understand! What specific questions do you have? Let's solve them now."
-
-**"I don't have enough for down payment"**
-❌ Don't: "Sorry, can't help"
-✅ Do: "What can you pay today? Let's work with that number."
-
-**"I'll buy next month"**
-❌ Don't: "Okay, goodbye"
-✅ Do: "Great! I'll set one aside. When exactly next month? Let's set a date."
-
-**"Your competitor is cheaper"**
-❌ Don't: "No we're not"
-✅ Do: "Tell me their price. I bet our warranty/service is better. Let me show you..."
-
-**"The phone is too new (risky)"**
-❌ Don't: "It's safe, trust me"
-✅ Do: "Actually, newer = better technology = lasts longer. Plus we have warranty."
-
-**"I need to ask my spouse"**
-❌ Don't: "Come back with them"
-✅ Do: "Smart decision! Can I talk to them now via phone? Quick 2-minute call?"
-
-**Golden Rule:**
-💡 **NEVER argue. Always agree, then redirect.**
-- "You're right, price matters!" (Agree)
-- "Let's find you the best value" (Redirect)`,
-
-    'motivation': `💪 **Sales Motivation & Energy:**
-
-**Remember Your Goals:**
-- Monthly Target: KES 500,000
-- Monthly Commission: KES 60,000
-- That's better than many jobs!
-- You control your earnings!
-
-**You Are NOT:**
-- A discount provider
-- A convincer
-- Desperate for sales
-
-**You ARE:**
-- A problem solver
-- Giving people access to tech NOW
-- Creating value
-- Earning commissions!
-
-**Daily Affirmations:**
-✨ "I am a great salesman"
-✨ "My customers love me"
-✨ "I'll hit my target this month"
-✨ "Every 'no' brings me closer to 'yes'"
-✨ "I earn KES 6,000 per sale - I deserve this"
-
-**When You're Tired:**
-- Remember your commission goals
-- Think about happiest customer
-- Imagine hitting monthly target
-- The next customer could be the one!
-
-**Celebrate Wins:**
-🎉 First sale? YES!
-🎉 Hit weekly target? YES!
-🎉 Customer referral? YES!
-🎉 Hit monthly target? BIG YES!
-
-**You've got this! Keep pushing! 🚀**`,
+Keep pushing! 🚀`,
   };
 
   const handleSendMessage = async () => {
@@ -316,15 +148,13 @@ Markup: KES 10,000 (20%)
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const userInput = inputValue.toLowerCase();
     setInputValue('');
     setIsLoading(true);
 
-    // Simulate bot thinking time
     setTimeout(() => {
-      const userInput = inputValue.toLowerCase();
       let botResponse = '';
 
-      // Check for matching topics
       for (const [key, response] of Object.entries(salesKnowledge)) {
         if (userInput.includes(key.split(' ')[0])) {
           botResponse = response;
@@ -332,20 +162,8 @@ Markup: KES 10,000 (20%)
         }
       }
 
-      // Default response if no match
       if (!botResponse) {
-        const suggestions = [
-          'Ask me about "sales tips" for proven techniques',
-          'Request "customer scripts" for real conversations',
-          'Ask "how to calculate commission" or "commission calc"',
-          'Get "lead strategies" to find more customers',
-          'Learn about "financing terms" to explain to customers',
-          'Ask about "handling objections" for tough situations',
-          'Get motivated with "motivation"!',
-        ];
-
-        botResponse =
-          `I can help with that! Try asking about:\n\n${suggestions.join('\n')}\n\nOr ask me anything about selling phones!`;
+        botResponse = `I can help with:\n• Sales tips\n• Customer scripts\n• Commission calc\n• Lead strategies\n• Financing terms\n• Motivation\n\nJust ask! 😊`;
       }
 
       const botMessage: ChatMessage = {
@@ -357,7 +175,7 @@ Markup: KES 10,000 (20%)
 
       setMessages((prev) => [...prev, botMessage]);
       setIsLoading(false);
-    }, 1000);
+    }, 800);
   };
 
   const handleQuickReply = (reply: string) => {
@@ -368,34 +186,32 @@ Markup: KES 10,000 (20%)
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition z-50"
+        className="fixed bottom-20 right-4 w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition z-50 flex items-center justify-center text-2xl font-bold"
         title="Sales Assistant"
       >
-        <div className="w-6 h-6">
-          <ChatIcon />
-        </div>
+        💬
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-20 right-4 w-96 h-96 bg-white rounded-lg shadow-2xl flex flex-col z-50 max-h-96">
+    <div className="fixed bottom-20 right-4 w-80 h-96 bg-white rounded-lg shadow-2xl flex flex-col z-50 max-h-96 border border-gray-200">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg flex items-center justify-between">
         <div>
-          <h3 className="font-bold">Sales Assistant 🤖</h3>
+          <h3 className="font-bold text-sm">Sales Assistant 🤖</h3>
           <p className="text-xs text-blue-100">Always here to help</p>
         </div>
         <button
           onClick={() => setIsOpen(false)}
-          className="text-white hover:bg-blue-800 p-1 rounded transition"
+          className="text-white hover:bg-blue-800 w-6 h-6 rounded flex items-center justify-center text-sm"
         >
           ✕
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -404,32 +220,20 @@ Markup: KES 10,000 (20%)
             }`}
           >
             <div
-              className={`max-w-xs px-4 py-2 rounded-lg ${
+              className={`max-w-xs px-3 py-2 rounded text-sm ${
                 message.sender === 'user'
                   ? 'bg-blue-600 text-white rounded-br-none'
                   : 'bg-white text-gray-900 border border-gray-200 rounded-bl-none'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-              <p
-                className={`text-xs mt-1 ${
-                  message.sender === 'user'
-                    ? 'text-blue-100'
-                    : 'text-gray-500'
-                }`}
-              >
-                {message.timestamp.toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
+              <p className="whitespace-pre-wrap">{message.text}</p>
             </div>
           </div>
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white text-gray-900 px-4 py-2 rounded-lg border border-gray-200 rounded-bl-none">
-              <p className="text-sm">Thinking...</p>
+            <div className="bg-white text-gray-900 px-3 py-2 rounded border border-gray-200 rounded-bl-none text-sm">
+              Thinking...
             </div>
           </div>
         )}
@@ -438,9 +242,9 @@ Markup: KES 10,000 (20%)
 
       {/* Quick Replies */}
       {messages.length <= 2 && (
-        <div className="px-4 py-3 bg-white border-t border-gray-200 space-y-2">
+        <div className="px-3 py-2 bg-white border-t border-gray-200 space-y-2">
           <p className="text-xs font-medium text-gray-600">Quick topics:</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1">
             {quickReplies.map((reply) => (
               <button
                 key={reply}
@@ -455,20 +259,20 @@ Markup: KES 10,000 (20%)
       )}
 
       {/* Input */}
-      <div className="p-4 bg-white border-t border-gray-200 rounded-b-lg">
+      <div className="p-3 bg-white border-t border-gray-200 rounded-b-lg">
         <div className="flex gap-2">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Ask me anything..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+            placeholder="Ask me..."
+            className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-600"
           />
           <button
             onClick={handleSendMessage}
             disabled={isLoading || !inputValue.trim()}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             Send
           </button>
