@@ -23,7 +23,7 @@ export default function AIAgent() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: `Hello! 👋 I'm your DAKIRO Assistant. I can help you with tasks like:\n• Add customers or devices\n• Search inventory\n• Generate receipts\n• View sales data\n• Create sales records\n\nWhat would you like to do?`,
+      text: `Hello! 👋 I'm your DAKIRO Assistant. I can help you with tasks like:\n• Add devices to inventory\n• Manage agent allocations\n• Create sales records\n• Log payments\n• Generate receipts\n• View reports & analytics\n\nNote: Customers are registered by agents, not by admin.\n\nWhat would you like to do?`,
       sender: 'agent',
       timestamp: new Date(),
     },
@@ -118,10 +118,10 @@ export default function AIAgent() {
   const getAgentResponse = (commandType: string): { text: string; actions?: ActionButton[] } => {
     const responses: Record<string, { text: string; actions?: ActionButton[] }> = {
       ADD_CUSTOMER: {
-        text: `I'll help you add a customer to DAKIRO's system. Click the button below to open the form.`,
+        text: `⚠️ Customers are managed by sales agents only. Agents register customers when creating sales. As an admin, you can view all registered customers in the Customers section.`,
         actions: [
-          { label: '➕ Add Customer', action: 'SHOW_ADD_CUSTOMER_FORM', type: 'primary' },
-          { label: '📋 View Customers', action: 'VIEW_CUSTOMERS', type: 'secondary' },
+          { label: '📋 View Customers', action: 'VIEW_CUSTOMERS', type: 'primary' },
+          { label: '📊 View Reports', action: 'VIEW_REPORTS', type: 'secondary' },
         ],
       },
 
@@ -166,7 +166,7 @@ export default function AIAgent() {
       },
 
       HELP: {
-        text: `I'm DAKIRO's AI Assistant. Here's what I can do:\n\n📱 **Inventory**: Add devices, search IMEI numbers\n👥 **Customers**: Register new customers, view profiles\n💳 **Sales**: Create sales records, track deals\n💰 **Payments**: Log payments, track installments\n📄 **Receipts**: Generate professional receipts\n📊 **Reports**: View sales data and statistics\n\nJust ask me to do any of these tasks!`,
+        text: `I'm DAKIRO's AI Assistant. Here's what I can do:\n\n📱 **Inventory**: Add devices, search IMEI numbers\n👥 **Customers**: View customer profiles (Agents register customers)\n💳 **Sales**: Create sales records, track deals\n💰 **Payments**: Log payments, track installments\n📄 **Receipts**: Generate professional receipts\n📊 **Reports**: View sales data and statistics\n👨‍💼 **Agents**: Manage agent allocations and performance\n\nNote: Customers are registered by sales agents only, not by admin.`,
       },
 
       INFO: {
@@ -183,10 +183,6 @@ export default function AIAgent() {
 
   const handleActionClick = (action: string) => {
     const actionHandlers: Record<string, () => void> = {
-      'SHOW_ADD_CUSTOMER_FORM': () => {
-        addMessage('Opening customer form...', 'user');
-        setShowQuickForm('ADD_CUSTOMER');
-      },
       'SHOW_ADD_DEVICE_FORM': () => {
         addMessage('Opening device form...', 'user');
         setShowQuickForm('ADD_DEVICE');
@@ -274,12 +270,12 @@ export default function AIAgent() {
   };
 
   const quickCommands = [
-    { label: '➕ Add Customer', cmd: 'add customer' },
     { label: '📱 Add Device', cmd: 'add device' },
     { label: '💳 Create Sale', cmd: 'create sale' },
     { label: '💰 Log Payment', cmd: 'log payment' },
     { label: '📄 Receipt', cmd: 'generate receipt' },
-    { label: '🔍 Search', cmd: 'search inventory' },
+    { label: '👥 Manage Agents', cmd: 'manage agents' },
+    { label: '📊 Reports', cmd: 'view reports' },
     { label: '❓ Help', cmd: 'help' },
     { label: 'ℹ️ Info', cmd: 'about dakiro' },
   ];
@@ -424,7 +420,6 @@ export default function AIAgent() {
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {showQuickForm === 'ADD_CUSTOMER' && '➕ Add Customer'}
                   {showQuickForm === 'ADD_DEVICE' && '📱 Add Device'}
                   {showQuickForm === 'CREATE_SALE' && '💳 Create Sale'}
                   {showQuickForm === 'LOG_PAYMENT' && '💰 Log Payment'}
@@ -444,39 +439,6 @@ export default function AIAgent() {
               </div>
 
               <div className="space-y-3">
-                {showQuickForm === 'ADD_CUSTOMER' && (
-                  <>
-                    <input
-                      type="text"
-                      placeholder="Customer Name"
-                      value={formData.name || ''}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Phone Number"
-                      value={formData.phone || ''}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                    />
-                    <input
-                      type="text"
-                      placeholder="National ID"
-                      value={formData.id || ''}
-                      onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Location"
-                      value={formData.location || ''}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                    />
-                  </>
-                )}
-
                 {showQuickForm === 'ADD_DEVICE' && (
                   <>
                     <input
