@@ -16,6 +16,11 @@ interface Customer {
   totalSpent: number;
   lastPurchaseDate?: string;
   lastPurchaseModel?: string;
+  nextOfKin: {
+    fullName: string;
+    phone: string;
+    relationship: string;
+  };
 }
 
 export default function CustomersList() {
@@ -37,6 +42,11 @@ export default function CustomersList() {
       totalSpent: 65500,
       lastPurchaseDate: '2026-08-10',
       lastPurchaseModel: 'Samsung Galaxy A05',
+      nextOfKin: {
+        fullName: 'Mary Wanjiru Kipchoge',
+        phone: '+254722111111',
+        relationship: 'Spouse',
+      },
     },
     {
       id: '2',
@@ -51,6 +61,11 @@ export default function CustomersList() {
       totalSpent: 50000,
       lastPurchaseDate: '2026-08-09',
       lastPurchaseModel: 'Samsung Galaxy A06',
+      nextOfKin: {
+        fullName: 'David Smith Adhiambo',
+        phone: '+254722222222',
+        relationship: 'Brother',
+      },
     },
     {
       id: '3',
@@ -65,6 +80,11 @@ export default function CustomersList() {
       totalSpent: 28000,
       lastPurchaseDate: '2026-08-08',
       lastPurchaseModel: 'Samsung Galaxy A16 5G',
+      nextOfKin: {
+        fullName: 'Sarah Otieno Johnson',
+        phone: '+254722333333',
+        relationship: 'Mother',
+      },
     },
     {
       id: '4',
@@ -77,6 +97,11 @@ export default function CustomersList() {
       registeredDate: '2026-04-05',
       totalPurchases: 0,
       totalSpent: 0,
+      nextOfKin: {
+        fullName: 'Joseph Njeri Kariuki',
+        phone: '+254722444444',
+        relationship: 'Father',
+      },
     },
     {
       id: '5',
@@ -91,6 +116,11 @@ export default function CustomersList() {
       totalSpent: 32000,
       lastPurchaseDate: '2026-08-06',
       lastPurchaseModel: 'Samsung Galaxy A26 5G',
+      nextOfKin: {
+        fullName: 'Susan Kipchoge Wilson',
+        phone: '+254722555555',
+        relationship: 'Sister',
+      },
     },
     {
       id: '6',
@@ -103,6 +133,11 @@ export default function CustomersList() {
       registeredDate: '2026-06-01',
       totalPurchases: 1,
       totalSpent: 20000,
+      nextOfKin: {
+        fullName: 'Thomas Kamau Wanjiru',
+        phone: '+254722666666',
+        relationship: 'Son',
+      },
     },
   ];
 
@@ -322,6 +357,25 @@ export default function CustomersList() {
                 <div>
                   <p className="text-sm text-gray-600">Registered Date</p>
                   <p className="font-medium text-gray-900">{formatDate(selectedCustomer.registeredDate)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Next of Kin */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Next of Kin Information</h3>
+              <div className="grid grid-cols-2 gap-4 bg-orange-50 rounded-lg p-4 border border-orange-200">
+                <div>
+                  <p className="text-sm text-gray-600">Full Name</p>
+                  <p className="font-medium text-gray-900">{selectedCustomer.nextOfKin.fullName}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Relationship</p>
+                  <p className="font-medium text-gray-900">{selectedCustomer.nextOfKin.relationship}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-600">Phone Number</p>
+                  <p className="font-medium text-gray-900">{selectedCustomer.nextOfKin.phone}</p>
                 </div>
               </div>
             </div>

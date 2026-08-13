@@ -26,6 +26,11 @@ interface SoldPhone {
     email: string;
     nationalId: string;
     location: string;
+    nextOfKin: {
+      fullName: string;
+      phone: string;
+      relationship: string;
+    };
   };
   agent: {
     name: string;
@@ -62,6 +67,11 @@ export default function SoldPhonesList() {
         email: 'john.kipchoge@email.com',
         nationalId: '12345678',
         location: 'Nairobi',
+        nextOfKin: {
+          fullName: 'Mary Wanjiru Kipchoge',
+          phone: '+254722111111',
+          relationship: 'Spouse',
+        },
       },
       agent: {
         name: 'Michael Kipchoge',
@@ -93,6 +103,11 @@ export default function SoldPhonesList() {
         email: 'jane.smith@email.com',
         nationalId: '87654321',
         location: 'Mombasa',
+        nextOfKin: {
+          fullName: 'David Smith Adhiambo',
+          phone: '+254722222222',
+          relationship: 'Brother',
+        },
       },
       agent: {
         name: 'Rose Tata',
@@ -123,6 +138,11 @@ export default function SoldPhonesList() {
         email: 'peter.otieno@email.com',
         nationalId: '11223344',
         location: 'Kisumu',
+        nextOfKin: {
+          fullName: 'Sarah Otieno Johnson',
+          phone: '+254722333333',
+          relationship: 'Mother',
+        },
       },
       agent: {
         name: 'James Mwangi',
@@ -154,6 +174,11 @@ export default function SoldPhonesList() {
         email: 'alice.njeri@email.com',
         nationalId: '55667788',
         location: 'Nairobi',
+        nextOfKin: {
+          fullName: 'Joseph Njeri Kariuki',
+          phone: '+254722444444',
+          relationship: 'Father',
+        },
       },
       agent: {
         name: 'Fatima Hassan',
@@ -184,6 +209,11 @@ export default function SoldPhonesList() {
         email: 'bob.wilson@email.com',
         nationalId: '99887766',
         location: 'Nakuru',
+        nextOfKin: {
+          fullName: 'Susan Kipchoge Wilson',
+          phone: '+254722555555',
+          relationship: 'Sister',
+        },
       },
       agent: {
         name: 'David Kipchoge',
@@ -410,6 +440,25 @@ export default function SoldPhonesList() {
                 <div className="col-span-2">
                   <p className="text-sm text-gray-600">Location</p>
                   <p className="font-medium text-gray-900">{selectedPhone.customer.location}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Next of Kin Information */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Next of Kin Information</h3>
+              <div className="grid grid-cols-2 gap-4 bg-orange-50 rounded-lg p-4 border border-orange-200">
+                <div>
+                  <p className="text-sm text-gray-600">Full Name</p>
+                  <p className="font-medium text-gray-900">{selectedPhone.customer.nextOfKin.fullName}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Relationship</p>
+                  <p className="font-medium text-gray-900">{selectedPhone.customer.nextOfKin.relationship}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-600">Phone Number</p>
+                  <p className="font-medium text-gray-900">{selectedPhone.customer.nextOfKin.phone}</p>
                 </div>
               </div>
             </div>
