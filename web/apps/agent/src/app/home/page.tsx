@@ -3,6 +3,7 @@
 import BottomNav from '../../components/BottomNav';
 import AgentHome from '../../components/AgentHome';
 import CommissionDashboard from '../../components/CommissionDashboard';
+import SalesAssistant from '../../components/SalesAssistant';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@core/types';
@@ -86,6 +87,9 @@ export default function Home({ user: initialUser, setUser }: HomeProps) {
 
       {/* Bottom Navigation */}
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {/* Sales Assistant */}
+      <SalesAssistant agentId={user.id} agentName={user.name} />
     </div>
   );
 }

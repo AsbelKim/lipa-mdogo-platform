@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LoginPage from './login/page';
+import SalesAssistant from '../components/SalesAssistant';
 import type { User } from '@core/types';
 
 export default function Page() {
@@ -38,5 +39,10 @@ export default function Page() {
     );
   }
 
-  return <LoginPage />;
+  return (
+    <>
+      <LoginPage />
+      <SalesAssistant />
+    </>
+  );
 }
