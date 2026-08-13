@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Modal from './Modal';
+import { validationRules } from '../utils/validationHelpers';
 
 interface AddDeviceModalProps {
   isOpen: boolean;
@@ -42,11 +43,30 @@ export default function AddDeviceModal({ isOpen, onClose, onAdd }: AddDeviceModa
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.model) newErrors.model = 'Model is required';
-    if (!formData.imei.trim()) newErrors.imei = 'IMEI number is required';
-    if (formData.imei.trim().length !== 15) newErrors.imei = 'IMEI must be 15 digits';
-    if (!formData.serialNumber.trim()) newErrors.serialNumber = 'Serial number is required';
-    if (!/^\d{15}$/.test(formData.imei)) newErrors.imei = 'IMEI must contain only digits';
+
+    // Validate model
+    if (!formData.model) {
+      newErrors.model = 'Phone model is required';
+    }
+
+    // Validate IMEI
+    const imeiError = validationRules.imei(formData.imei);
+    if (imeiError) {
+      newErrors.imei = imeiError;
+    }
+
+    // Validate serial number
+    const serialError = validationRules.serialNumber(formData.serialNumber);
+    if (serialError) {
+      newErrors.serialNumber = serialError;
+    }
+
+    // Validate condition
+    const conditionError = validationRules.condition(formData.condition);
+    if (conditionError) {
+      newErrors.condition = conditionError;
+    }
+
     return newErrors;
   };
 
@@ -145,12 +165,15 @@ export default function AddDeviceModal({ isOpen, onClose, onAdd }: AddDeviceModa
             name="condition"
             value={formData.condition}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+              errors.condition ? 'border-red-500' : 'border-gray-300'
+            }`}
           >
             <option value="new">New</option>
             <option value="refurbished">Refurbished</option>
             <option value="used">Used</option>
           </select>
+          {errors.condition && <p className="text-red-500 text-xs mt-1">{errors.condition}</p>}
         </div>
 
         <div className="flex gap-3 pt-4">
