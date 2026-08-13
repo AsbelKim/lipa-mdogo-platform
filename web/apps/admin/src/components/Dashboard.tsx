@@ -2,11 +2,8 @@
 
 import { useState } from 'react';
 import StatCard from './StatCard';
-import { PlusIcon, ShoppingIcon, CreditCardIcon, AlertIcon } from './Icons';
+import { PlusIcon } from './Icons';
 import AddDeviceModal from './AddDeviceModal';
-import AddCustomerModal from './AddCustomerModal';
-import CreateSaleModal from './CreateSaleModal';
-import LogPaymentModal from './LogPaymentModal';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -18,9 +15,6 @@ export default function Dashboard() {
 
   const [modals, setModals] = useState({
     addDevice: false,
-    addCustomer: false,
-    createSale: false,
-    logPayment: false,
   });
 
   const openModal = (modalName: keyof typeof modals) => {
@@ -33,18 +27,6 @@ export default function Dashboard() {
 
   const handleAddDevice = () => {
     setStats({ ...stats, devices: stats.devices + 1 });
-  };
-
-  const handleAddCustomer = () => {
-    setStats({ ...stats, customers: stats.customers + 1 });
-  };
-
-  const handleCreateSale = () => {
-    setStats({ ...stats, sales: stats.sales + 1 });
-  };
-
-  const handleLogPayment = () => {
-    setStats({ ...stats, payments: stats.payments + 1 });
   };
 
   return (
@@ -83,8 +65,8 @@ export default function Dashboard() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6 border-t-4 border-primary">
-        <h2 className="text-xl font-semibold text-watu-dark mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <h2 className="text-xl font-semibold text-watu-dark mb-4">Admin Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
             onClick={() => openModal('addDevice')}
             className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary flex flex-col items-center gap-2"
@@ -92,36 +74,12 @@ export default function Dashboard() {
             <div className="w-6 h-6">
               <PlusIcon />
             </div>
-            <span className="text-sm">Add Device</span>
-          </button>
-          <button
-            onClick={() => openModal('addCustomer')}
-            className="p-4 border-2 border-primary rounded-lg hover:bg-primary/5 transition font-medium text-primary flex flex-col items-center gap-2"
-          >
-            <div className="w-6 h-6">
-              <AlertIcon />
-            </div>
-            <span className="text-sm">Add Customer</span>
-          </button>
-          <button
-            onClick={() => openModal('createSale')}
-            className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary flex flex-col items-center gap-2"
-          >
-            <div className="w-6 h-6">
-              <ShoppingIcon />
-            </div>
-            <span className="text-sm">Create Sale</span>
-          </button>
-          <button
-            onClick={() => openModal('logPayment')}
-            className="p-4 border-2 border-secondary rounded-lg hover:bg-secondary/5 transition font-medium text-secondary flex flex-col items-center gap-2"
-          >
-            <div className="w-6 h-6">
-              <CreditCardIcon />
-            </div>
-            <span className="text-sm">Log Payment</span>
+            <span className="text-sm">Add Device to Inventory</span>
           </button>
         </div>
+        <p className="text-xs text-gray-500 mt-4">
+          💡 Note: Customers, sales, and payments are managed by sales agents. Use the Agents section to manage agent allocations and inventory.
+        </p>
       </div>
 
       {/* Modals */}
@@ -129,21 +87,6 @@ export default function Dashboard() {
         isOpen={modals.addDevice}
         onClose={() => closeModal('addDevice')}
         onAdd={handleAddDevice}
-      />
-      <AddCustomerModal
-        isOpen={modals.addCustomer}
-        onClose={() => closeModal('addCustomer')}
-        onAdd={handleAddCustomer}
-      />
-      <CreateSaleModal
-        isOpen={modals.createSale}
-        onClose={() => closeModal('createSale')}
-        onAdd={handleCreateSale}
-      />
-      <LogPaymentModal
-        isOpen={modals.logPayment}
-        onClose={() => closeModal('logPayment')}
-        onAdd={handleLogPayment}
       />
     </div>
   );
