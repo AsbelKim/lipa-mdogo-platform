@@ -17,19 +17,38 @@ interface Report {
   description: string;
   icon: string;
   color: string;
+  category?: string;
+}
+
+interface PhoneModel {
+  id: string;
+  name: string;
+  icon: string;
 }
 
 export default function Reports() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<'pdf' | 'excel'>('pdf');
+  const [activeCategory, setActiveCategory] = useState<'general' | 'phone-models'>('general');
 
-  const reports: Report[] = [
+  const phoneModels: PhoneModel[] = [
+    { id: 'a05', name: 'Samsung Galaxy A05', icon: '📱' },
+    { id: 'a06', name: 'Samsung Galaxy A06', icon: '📱' },
+    { id: 'a07', name: 'Samsung Galaxy A07', icon: '📱' },
+    { id: 'a16', name: 'Samsung Galaxy A16 5G', icon: '📱' },
+    { id: 'a26', name: 'Samsung Galaxy A26 5G', icon: '📱' },
+    { id: 'a36', name: 'Samsung Galaxy A36 5G', icon: '📱' },
+    { id: 'a56', name: 'Samsung Galaxy A56 5G', icon: '📱' },
+  ];
+
+  const generalReports: Report[] = [
     {
       id: 'sales',
       title: 'Sales Report',
       description: 'Complete sales transactions, revenue, and payment tracking',
       icon: '📊',
       color: 'from-blue-500 to-blue-600',
+      category: 'general',
     },
     {
       id: 'customers',
@@ -37,6 +56,7 @@ export default function Reports() {
       description: 'Customer list, contact info, next of kin, and purchase history',
       icon: '👥',
       color: 'from-green-500 to-green-600',
+      category: 'general',
     },
     {
       id: 'agents',
@@ -44,13 +64,15 @@ export default function Reports() {
       description: 'Agent performance, locations, sales metrics, and conversion rates',
       icon: '👨‍💼',
       color: 'from-purple-500 to-purple-600',
+      category: 'general',
     },
     {
       id: 'inventory',
       title: 'Phone Inventory Report',
       description: 'All phones in stock with IMEI, serial numbers, and conditions',
-      icon: '📱',
+      icon: '📦',
       color: 'from-orange-500 to-orange-600',
+      category: 'general',
     },
     {
       id: 'payments',
@@ -58,6 +80,7 @@ export default function Reports() {
       description: 'Payment history, methods, and outstanding balances',
       icon: '💳',
       color: 'from-pink-500 to-pink-600',
+      category: 'general',
     },
     {
       id: 'analytics',
@@ -65,8 +88,11 @@ export default function Reports() {
       description: 'Revenue trends, performance metrics, and KPIs',
       icon: '📈',
       color: 'from-indigo-500 to-indigo-600',
+      category: 'general',
     },
   ];
+
+  const reports = activeCategory === 'general' ? generalReports : [];
 
   // Mock data for reports
   const mockSalesData = [
@@ -237,7 +263,34 @@ export default function Reports() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">📄 Reports & Exports</h1>
-        <p className="text-gray-600 mt-1">Generate and download business reports in multiple formats</p>
+        <p className="text-gray-600 mt-1">Generate and download business reports by category and phone model</p>
+      </div>
+
+      {/* Category Tabs */}
+      <div className="bg-white rounded-lg shadow p-4">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Report Categories</h2>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setActiveCategory('general')}
+            className={`px-6 py-2 rounded-lg font-medium transition ${
+              activeCategory === 'general'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            📊 General Reports
+          </button>
+          <button
+            onClick={() => setActiveCategory('phone-models')}
+            className={`px-6 py-2 rounded-lg font-medium transition ${
+              activeCategory === 'phone-models'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            📱 Phone Model Reports
+          </button>
+        </div>
       </div>
 
       {/* Format Selector */}
@@ -265,7 +318,8 @@ export default function Reports() {
         </p>
       </div>
 
-      {/* Reports Grid */}
+      {/* General Reports Grid */}
+      {activeCategory === 'general' && (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {reports.map((report) => (
           <div key={report.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
@@ -307,8 +361,59 @@ export default function Reports() {
           </div>
         ))}
       </div>
+      )}
+
+      {/* Phone Model Reports Grid */}
+      {activeCategory === 'phone-models' && (
+      <div className="space-y-6">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-900">
+            📱 Generate detailed reports for each phone model including sales, inventory, revenue, and agent performance
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {phoneModels.map((model) => (
+            <div key={model.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
+              <div className="bg-gradient-to-r from-primary to-primary/80 p-6 text-white">
+                <div className="text-4xl mb-2">{model.icon}</div>
+                <h3 className="text-xl font-bold">{model.name}</h3>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <p className="text-gray-600 text-sm">
+                  Get comprehensive data for {model.name} including:
+                </p>
+
+                <div className="bg-gray-50 rounded p-3 text-sm text-gray-700 space-y-1">
+                  <p>✓ Total units sold</p>
+                  <p>✓ Revenue generated</p>
+                  <p>✓ Inventory status (in-stock/allocated)</p>
+                  <p>✓ Customer details who bought this model</p>
+                  <p>✓ Agent performance with this model</p>
+                  <p>✓ Payment tracking</p>
+                </div>
+
+                <button
+                  onClick={() => handleDownloadReport(model.id, model.name)}
+                  disabled={isLoading}
+                  className={`w-full py-2 rounded-lg font-medium transition ${
+                    isLoading
+                      ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-primary to-primary/80 text-white hover:shadow-lg hover:scale-105'
+                  }`}
+                >
+                  {isLoading ? '⏳ Generating...' : '⬇️ Download ' + selectedFormat.toUpperCase()}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      )}
 
       {/* Info Box */}
+      {activeCategory === 'general' && (
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="font-semibold text-blue-900 mb-2">💡 Report Information</h3>
         <ul className="text-sm text-blue-800 space-y-1">
@@ -319,6 +424,18 @@ export default function Reports() {
           <li>✓ Word documents are editable and can be customized</li>
         </ul>
       </div>
+      )}
     </div>
   );
+
+  function handleDownloadReport(phoneModelId: string, phoneModelName: string) {
+    setIsLoading(true);
+    const timestamp = new Date().toISOString().slice(0, 10);
+
+    // Simulate download
+    setTimeout(() => {
+      alert(`📥 ${phoneModelName} Report\n\nFormat: ${selectedFormat.toUpperCase()}\nFile: ${phoneModelName.replace(/ /g, '_')}_Report_${timestamp}.${selectedFormat === 'pdf' ? 'pdf' : 'xlsx'}`);
+      setIsLoading(false);
+    }, 1500);
+  }
 }
