@@ -27,6 +27,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     { id: 'agent-inventory', label: 'Agent Stock View', icon: ShoppingIcon },
     { id: 'devices', label: 'Device Assignments', icon: ShieldIcon },
     { id: 'pending-sales', label: 'Sales Approval', icon: ShoppingIcon },
+    { id: 'receipt-requests', label: 'Receipt Requests', icon: ShoppingIcon },
     { id: 'agent-receipts', label: 'My E-Receipts', icon: ShoppingIcon },
     { id: 'customers', label: 'Customers', icon: WalletIcon },
     { id: 'sold-phones', label: 'Sold Phones', icon: ShoppingIcon },

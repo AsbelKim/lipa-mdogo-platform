@@ -9,6 +9,7 @@ import MyCustomers from '../../../components/agent/MyCustomers';
 import MyStock from '../../../components/agent/MyStock';
 import CreateSale from '../../../components/agent/CreateSale';
 import MyReceipts from '../../../components/agent/MyReceipts';
+import RequestReceipt from '../../../components/agent/RequestReceipt';
 import PaymentTracking from '../../../components/agent/PaymentTracking';
 import { ToastContainer } from '../../../components/Toast';
 
@@ -73,6 +74,7 @@ export default function AgentDashboardPage() {
             {activeTab === 'customers' && <MyCustomers />}
             {activeTab === 'stock' && <MyStock />}
             {activeTab === 'create-sale' && <CreateSale />}
+            {activeTab === 'request-receipt' && <RequestReceipt />}
             {activeTab === 'receipts' && <MyReceipts />}
             {activeTab === 'payments' && <PaymentTracking />}
           </div>
