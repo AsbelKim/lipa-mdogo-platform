@@ -32,6 +32,87 @@ export default function AgentAllocationManager() {
   // Sample allocated phones data with localStorage persistence
   const [allocatedPhones, setAllocatedPhones] = useState<IndividualPhoneAllocation[]>([]);
 
+  // Load from localStorage on mount
+  useEffect(() => {
+    const savedAllocations = localStorage.getItem('agentAllocations');
+    const savedAgents = localStorage.getItem('agentDetails');
+
+    if (savedAllocations) {
+      try {
+        setAllocatedPhones(JSON.parse(savedAllocations));
+      } catch (e) {
+        console.error('Failed to load allocations:', e);
+      }
+    } else {
+      // Initialize with default data on first load
+      const defaultAllocations: IndividualPhoneAllocation[] = [
+        {
+          id: 'alloc-1',
+          agentId: 'agent-1',
+          phoneId: 'phone-1',
+          model: 'Samsung Galaxy A56 5G',
+          imei: '359072080276522',
+          serialNumber: 'RF9DL1A20GU',
+          condition: 'new',
+          status: 'in-stock',
+          dateAllocated: new Date().toISOString(),
+        },
+        {
+          id: 'alloc-2',
+          agentId: 'agent-1',
+          phoneId: 'phone-2',
+          model: 'Samsung Galaxy A56 5G',
+          imei: '359072080276523',
+          serialNumber: 'RF9DL1A20GV',
+          condition: 'new',
+          status: 'sold',
+          dateAllocated: new Date().toISOString(),
+          dateSold: new Date().toISOString(),
+          customerName: 'John Doe',
+        },
+        {
+          id: 'alloc-3',
+          agentId: 'agent-2',
+          phoneId: 'phone-3',
+          model: 'Samsung Galaxy A36 5G',
+          imei: '359072080276524',
+          serialNumber: 'RF9DL1A20GW',
+          condition: 'refurbished',
+          status: 'in-stock',
+          dateAllocated: new Date().toISOString(),
+        },
+      ];
+      setAllocatedPhones(defaultAllocations);
+      localStorage.setItem('agentAllocations', JSON.stringify(defaultAllocations));
+    }
+
+    if (savedAgents) {
+      try {
+        setAgents(JSON.parse(savedAgents));
+      } catch (e) {
+        console.error('Failed to load agents:', e);
+      }
+    } else {
+      localStorage.setItem('agentDetails', JSON.stringify(SALES_AGENTS));
+    }
+
+    setIsLoaded(true);
+  }, []);
+
+  // Save allocations to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('agentAllocations', JSON.stringify(allocatedPhones));
+    }
+  }, [allocatedPhones, isLoaded]);
+
+  // Save agents to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('agentDetails', JSON.stringify(agents));
+    }
+  }, [agents, isLoaded]);
+
   // All phones in inventory
   const allInventoryPhones: IndividualPhoneAllocation[] = [
     {
@@ -166,6 +247,17 @@ export default function AgentAllocationManager() {
     setAllocatedPhones(allocatedPhones.filter((p) => p.id !== phoneId));
     alert('✅ Phone removed from agent!');
   };
+
+  // Wait for data to load from localStorage before rendering
+  if (!isLoaded) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <p className="text-gray-600">Loading agent data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
