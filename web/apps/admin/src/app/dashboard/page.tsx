@@ -13,7 +13,7 @@ import CustomersList from '../../components/CustomersList';
 import SoldPhonesList from '../../components/SoldPhonesList';
 import SalesAnalytics from '../../components/SalesAnalytics';
 import Reports from '../../components/Reports';
-import ChatBot from '../../components/ChatBot';
+import AIAgent from '../../components/AIAgent';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -72,8 +72,8 @@ export default function DashboardPage() {
         </main>
       </div>
 
-      {/* Chat Bot */}
-      <ChatBot />
+      {/* AI Assistant */}
+      <AIAgent />
     </div>
   );
 }
