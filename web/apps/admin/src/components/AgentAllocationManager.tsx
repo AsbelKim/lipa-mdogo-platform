@@ -67,8 +67,8 @@ export default function AgentAllocationManager() {
     },
   ]);
 
-  // Available phones for allocation (in-stock phones not yet allocated)
-  const availablePhones: IndividualPhoneAllocation[] = [
+  // All phones in inventory
+  const allInventoryPhones: IndividualPhoneAllocation[] = [
     {
       id: 'phone-4',
       agentId: '',
@@ -91,7 +91,45 @@ export default function AgentAllocationManager() {
       status: 'in-stock',
       dateAllocated: '',
     },
+    {
+      id: 'phone-6',
+      agentId: '',
+      phoneId: 'phone-6',
+      model: 'Samsung Galaxy A16 5G',
+      imei: '359072080276527',
+      serialNumber: 'RF9DL1A20GZ',
+      condition: 'new',
+      status: 'in-stock',
+      dateAllocated: '',
+    },
+    {
+      id: 'phone-7',
+      agentId: '',
+      phoneId: 'phone-7',
+      model: 'Samsung Galaxy A26 5G',
+      imei: '359072080276528',
+      serialNumber: 'RF9DL1A20HA',
+      condition: 'new',
+      status: 'in-stock',
+      dateAllocated: '',
+    },
+    {
+      id: 'phone-8',
+      agentId: '',
+      phoneId: 'phone-8',
+      model: 'Samsung Galaxy A36 5G',
+      imei: '359072080276529',
+      serialNumber: 'RF9DL1A20HB',
+      condition: 'refurbished',
+      status: 'in-stock',
+      dateAllocated: '',
+    },
   ];
+
+  // Calculate available phones (not yet allocated)
+  const availablePhones = allInventoryPhones.filter(
+    (phone) => !allocatedPhones.some((alloc) => alloc.phoneId === phone.phoneId)
+  );
 
   const getAgentPhones = (agentId: string) => {
     return allocatedPhones.filter((p) => p.agentId === agentId);
@@ -124,18 +162,22 @@ export default function AgentAllocationManager() {
     }
 
     const phoneToAllocate = availablePhones.find((p) => p.imei === selectedPhoneImei);
-    if (phoneToAllocate) {
-      const newAllocation: IndividualPhoneAllocation = {
-        ...phoneToAllocate,
-        agentId: selectedAgent,
-        dateAllocated: new Date().toISOString(),
-      };
-      setAllocatedPhones([...allocatedPhones, newAllocation]);
-      setSelectedAgent('');
-      setSelectedPhoneImei('');
-      setShowAllocationForm(false);
-      alert('✅ Phone allocated successfully!');
+    if (!phoneToAllocate) {
+      alert('Phone is no longer available or already allocated');
+      return;
     }
+
+    const selectedAgentName = agents.find((a) => a.id === selectedAgent)?.name || 'Agent';
+    const newAllocation: IndividualPhoneAllocation = {
+      ...phoneToAllocate,
+      agentId: selectedAgent,
+      dateAllocated: new Date().toISOString(),
+    };
+    setAllocatedPhones([...allocatedPhones, newAllocation]);
+    setSelectedAgent('');
+    setSelectedPhoneImei('');
+    setShowAllocationForm(false);
+    alert(`✅ ${phoneToAllocate.model} allocated to ${selectedAgentName}!\n\nIMEI: ${phoneToAllocate.imei}`);
   };
 
   const handleEditAgent = (agent: typeof SALES_AGENTS[0]) => {
@@ -302,22 +344,51 @@ export default function AgentAllocationManager() {
         })}
       </div>
 
+      {/* Inventory Summary */}
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow text-white p-6">
+        <h3 className="text-lg font-bold mb-4">📦 Inventory Summary</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p className="text-sm opacity-90">Total Inventory</p>
+            <p className="text-3xl font-bold">{allInventoryPhones.length}</p>
+          </div>
+          <div>
+            <p className="text-sm opacity-90">Available (Unallocated)</p>
+            <p className="text-3xl font-bold text-green-300">{availablePhones.length}</p>
+          </div>
+          <div>
+            <p className="text-sm opacity-90">Allocated to Agents</p>
+            <p className="text-3xl font-bold text-amber-300">{allocatedPhones.length}</p>
+          </div>
+          <div>
+            <p className="text-sm opacity-90">Allocation Rate</p>
+            <p className="text-3xl font-bold">
+              {allInventoryPhones.length > 0
+                ? Math.round((allocatedPhones.length / allInventoryPhones.length) * 100)
+                : 0}%
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Summary Stats */}
       <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg shadow text-white p-6">
-        <h3 className="text-lg font-bold mb-4">Overall Team Performance</h3>
+        <h3 className="text-lg font-bold mb-4">👥 Overall Team Performance</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <p className="text-sm opacity-90">Total Agents</p>
             <p className="text-3xl font-bold">{agents.length}</p>
           </div>
           <div>
-            <p className="text-sm opacity-90">Total Allocated</p>
-            <p className="text-3xl font-bold">{allocatedPhones.length}</p>
-          </div>
-          <div>
             <p className="text-sm opacity-90">Total Sold</p>
             <p className="text-3xl font-bold">
               {allocatedPhones.filter((p) => p.status === 'sold').length}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm opacity-90">In Stock with Agents</p>
+            <p className="text-3xl font-bold">
+              {allocatedPhones.filter((p) => p.status === 'in-stock').length}
             </p>
           </div>
           <div>
