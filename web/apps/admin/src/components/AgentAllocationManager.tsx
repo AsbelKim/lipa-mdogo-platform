@@ -328,6 +328,250 @@ export default function AgentAllocationManager() {
           </div>
         </div>
       </div>
+
+      {/* Agent Detail Modal */}
+      {detailModalAgent && (
+        <Modal
+          isOpen={!!detailModalAgent}
+          onClose={() => {
+            setDetailModalAgent(null);
+            setIsEditingAgent(false);
+            setEditedAgent(null);
+          }}
+          title={`Agent Details - ${detailModalAgent.name}`}
+        >
+          <div className="space-y-6">
+            {/* Agent Information */}
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Agent Information</h3>
+                {!isEditingAgent && (
+                  <button
+                    onClick={() => handleEditAgent(detailModalAgent)}
+                    className="px-3 py-1 text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 rounded transition"
+                  >
+                    ✏️ Edit
+                  </button>
+                )}
+              </div>
+
+              {isEditingAgent && editedAgent ? (
+                <div className="space-y-4 bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={editedAgent.name}
+                      onChange={(e) => setEditedAgent({ ...editedAgent, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={editedAgent.phone}
+                      onChange={(e) => setEditedAgent({ ...editedAgent, phone: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={editedAgent.email}
+                      onChange={(e) => setEditedAgent({ ...editedAgent, email: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input
+                      type="text"
+                      value={editedAgent.location}
+                      onChange={(e) => setEditedAgent({ ...editedAgent, location: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={handleSaveAgent}
+                      className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium"
+                    >
+                      ✓ Save Changes
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsEditingAgent(false);
+                        setEditedAgent(null);
+                      }}
+                      className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div>
+                    <p className="text-sm text-gray-600">Name</p>
+                    <p className="font-medium text-gray-900">{detailModalAgent.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Phone</p>
+                    <p className="font-medium text-gray-900">{detailModalAgent.phone}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-600">Email</p>
+                    <p className="font-medium text-gray-900">{detailModalAgent.email}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-600">Location</p>
+                    <p className="font-medium text-gray-900">{detailModalAgent.location}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Performance Stats */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Metrics</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {(() => {
+                  const stats = getAgentStats(detailModalAgent.id);
+                  return (
+                    <>
+                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                        <p className="text-sm text-gray-600">Total Allocated</p>
+                        <p className="text-2xl font-bold text-blue-600">{stats.totalAllocated}</p>
+                      </div>
+                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                        <p className="text-sm text-gray-600">Units Sold</p>
+                        <p className="text-2xl font-bold text-green-600">{stats.totalSold}</p>
+                      </div>
+                      <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                        <p className="text-sm text-gray-600">In Stock</p>
+                        <p className="text-2xl font-bold text-amber-600">{stats.totalUnsold}</p>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        <p className="text-sm text-gray-600">Conversion Rate</p>
+                        <p className="text-2xl font-bold text-purple-600">{stats.conversionRate}%</p>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Allocated Phones */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Stock Assigned to Agent</h3>
+              {(() => {
+                const agentPhones = getAgentPhones(detailModalAgent.id);
+                if (agentPhones.length === 0) {
+                  return (
+                    <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+                      No phones allocated to this agent yet
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {agentPhones.map((phone) => (
+                      <div key={phone.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900">{phone.model}</p>
+                            <p className="text-xs text-gray-600 font-mono mt-1">IMEI: {phone.imei}</p>
+                            <p className="text-xs text-gray-600">Serial: {phone.serialNumber}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                                phone.status === 'sold'
+                                  ? 'bg-green-100 text-green-800'
+                                  : phone.status === 'in-stock'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {phone.status === 'sold' ? '✓ Sold' : phone.status === 'in-stock' ? '📱 In Stock' : 'Damaged'}
+                            </span>
+                            <button
+                              onClick={() => handleRemovePhoneFromAgent(phone.id)}
+                              className="px-2 py-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded transition"
+                            >
+                              ✕ Remove
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 text-xs text-gray-600">
+                          <span>Condition: <strong>{phone.condition}</strong></span>
+                          <span>Allocated: <strong>{new Date(phone.dateAllocated).toLocaleDateString()}</strong></span>
+                          {phone.status === 'sold' && phone.customerName && (
+                            <span>Customer: <strong>{phone.customerName}</strong></span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Allocate New Phone */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Assign Phone to Agent</h3>
+              <div className="space-y-3 bg-green-50 rounded-lg p-4 border border-green-200">
+                <select
+                  value={selectedPhoneImei}
+                  onChange={(e) => setSelectedPhoneImei(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="">Select a phone from available stock...</option>
+                  {availablePhones.map((phone) => (
+                    <option key={phone.imei} value={phone.imei}>
+                      {phone.model} - IMEI: {phone.imei}
+                    </option>
+                  ))}
+                </select>
+                {selectedPhoneImei && (
+                  <>
+                    <div className="bg-white rounded p-3 text-sm text-gray-700 border border-green-300">
+                      {availablePhones.find((p) => p.imei === selectedPhoneImei) && (
+                        <>
+                          <p>Model: <strong>{availablePhones.find((p) => p.imei === selectedPhoneImei)?.model}</strong></p>
+                          <p>Serial: <strong>{availablePhones.find((p) => p.imei === selectedPhoneImei)?.serialNumber}</strong></p>
+                          <p>Condition: <strong>{availablePhones.find((p) => p.imei === selectedPhoneImei)?.condition}</strong></p>
+                        </>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        const phoneToAllocate = availablePhones.find((p) => p.imei === selectedPhoneImei);
+                        if (phoneToAllocate) {
+                          const newAllocation: IndividualPhoneAllocation = {
+                            ...phoneToAllocate,
+                            agentId: detailModalAgent.id,
+                            dateAllocated: new Date().toISOString(),
+                          };
+                          setAllocatedPhones([...allocatedPhones, newAllocation]);
+                          setSelectedPhoneImei('');
+                          alert('✅ Phone assigned to agent!');
+                        }
+                      }}
+                      className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium"
+                    >
+                      ✓ Assign Phone to {detailModalAgent.name}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
