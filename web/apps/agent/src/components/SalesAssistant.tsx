@@ -368,7 +368,7 @@ Markup: KES 10,000 (20%)
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition z-40"
+        className="fixed bottom-20 right-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition z-50"
         title="Sales Assistant"
       >
         <div className="w-6 h-6">
@@ -379,7 +379,7 @@ Markup: KES 10,000 (20%)
   }
 
   return (
-    <div className="fixed bottom-24 right-4 w-96 h-96 bg-white rounded-lg shadow-2xl flex flex-col z-40 max-h-96">
+    <div className="fixed bottom-20 right-4 w-96 h-96 bg-white rounded-lg shadow-2xl flex flex-col z-50 max-h-96">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg flex items-center justify-between">
         <div>
