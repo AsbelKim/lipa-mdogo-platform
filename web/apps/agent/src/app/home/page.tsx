@@ -2,6 +2,7 @@
 
 import BottomNav from '../../components/BottomNav';
 import AgentHome from '../../components/AgentHome';
+import CommissionDashboard from '../../components/CommissionDashboard';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@core/types';
@@ -79,6 +80,7 @@ export default function Home({ user: initialUser, setUser }: HomeProps) {
         {activeTab === 'home' && <AgentHome agentId={user.id} />}
         {activeTab === 'sales' && <SalesTab agentId={user.id} />}
         {activeTab === 'leads' && <LeadsTab agentId={user.id} />}
+        {activeTab === 'earnings' && <EarningsTab agentId={user.id} />}
         {activeTab === 'profile' && <ProfileTab user={user} />}
       </div>
 
@@ -196,6 +198,15 @@ function LeadsTab({ agentId }: { agentId: string }) {
           No leads yet
         </div>
       )}
+    </div>
+  );
+}
+
+function EarningsTab({ agentId }: { agentId: string }) {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-gray-900">Earnings & Performance</h2>
+      <CommissionDashboard agentId={agentId} />
     </div>
   );
 }

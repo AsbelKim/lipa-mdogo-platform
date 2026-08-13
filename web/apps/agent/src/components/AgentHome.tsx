@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { PlusIcon, ShoppingIcon, CreditCardIcon, Icon } from './Icons';
 import AddLeadModal from './AddLeadModal';
+import CreateSaleModal from './CreateSaleModal';
+import LogPaymentModal from './LogPaymentModal';
 import { Device, Sale, Lead } from '@core/types';
 
 interface AgentHomeProps {
@@ -15,6 +17,8 @@ export default function AgentHome({ agentId }: AgentHomeProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [showCreateSaleModal, setShowCreateSaleModal] = useState(false);
+  const [showLogPaymentModal, setShowLogPaymentModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,14 +109,14 @@ export default function AgentHome({ agentId }: AgentHomeProps) {
             Add Lead
           </button>
           <button
-            onClick={() => alert('Sale creation modal coming soon')}
+            onClick={() => setShowCreateSaleModal(true)}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
           >
             <Icon icon={ShoppingIcon} size="md" className="text-white" />
             Create Sale
           </button>
           <button
-            onClick={() => alert('Payment logging modal coming soon')}
+            onClick={() => setShowLogPaymentModal(true)}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
           >
             <Icon icon={CreditCardIcon} size="md" className="text-white" />
@@ -130,6 +134,31 @@ export default function AgentHome({ agentId }: AgentHomeProps) {
           onLeadAdded={() => {
             // Refresh leads count
             setStats((prev) => ({ ...prev, leads: prev.leads + 1 }));
+          }}
+        />
+      )}
+
+      {/* Create Sale Modal */}
+      {agentId && (
+        <CreateSaleModal
+          isOpen={showCreateSaleModal}
+          onClose={() => setShowCreateSaleModal(false)}
+          agentId={agentId}
+          onSaleCreated={() => {
+            // Refresh sales count
+            setStats((prev) => ({ ...prev, sales: prev.sales + 1 }));
+          }}
+        />
+      )}
+
+      {/* Log Payment Modal */}
+      {agentId && (
+        <LogPaymentModal
+          isOpen={showLogPaymentModal}
+          onClose={() => setShowLogPaymentModal(false)}
+          agentId={agentId}
+          onPaymentLogged={() => {
+            // Payment logged successfully
           }}
         />
       )}

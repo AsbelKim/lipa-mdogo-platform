@@ -1,6 +1,6 @@
 'use client';
 
-import { HomeIcon, ShoppingIcon, TrendingIcon, UsersIcon, Icon } from './Icons';
+import { HomeIcon, ShoppingIcon, TrendingIcon, UsersIcon, WalletIcon, Icon } from './Icons';
 
 interface BottomNavProps {
   activeTab: string;
@@ -12,6 +12,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
     { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'sales', label: 'Sales', icon: ShoppingIcon },
     { id: 'leads', label: 'Leads', icon: TrendingIcon },
+    { id: 'earnings', label: 'Earnings', icon: WalletIcon },
     { id: 'profile', label: 'Profile', icon: UsersIcon },
   ];
 
