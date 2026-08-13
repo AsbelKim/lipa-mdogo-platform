@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Modal from './Modal';
+import { showToast } from './Toast';
 
 interface ApprovedSale {
   id: string;
@@ -38,54 +39,54 @@ export default function AgentSalesSubmission() {
   }, []);
 
   const downloadReceipt = (sale: ApprovedSale) => {
+    const saleDate = new Date(sale.saleDateApproved);
+    const day = String(saleDate.getDate()).padStart(2, '0');
+    const month = String(saleDate.getMonth() + 1).padStart(2, '0');
+    const year = String(saleDate.getFullYear()).slice(-2);
+    const monthlyPayment = Math.round((sale.totalPrice - sale.downPayment) / sale.installmentMonths);
+
     const receiptContent = `
-DAKIRO GENERAL ELECTRONICS
-=====================================
-OFFICIAL SALES RECEIPT
-=====================================
+                                CASH SALE
+                    DAKIRO GENERAL ELECTRONICS
+                    P.O BOX 46, KERICHO. Tel: 0720 049 708
+                Opposite Kapsoit Guest House - Kapsoit Town
 
-Receipt ID: ${sale.receiptId}
-Date Approved: ${new Date(sale.saleDateApproved).toLocaleDateString()}
+Date: ${day}/${month}/${year}
 
-=====================================
-CUSTOMER INFORMATION
-=====================================
-Name: ${sale.customerName}
-Phone: ${sale.customerPhone}
+M/S ${sale.customerName}
 
-=====================================
-PHONE DETAILS
-=====================================
-Model: ${sale.phoneModel}
-IMEI: ${sale.imei}
-Serial: ${sale.serialNumber}
+Dealers in: TV's, DVD, Phone, Phone Accessories, Players, Batteries,
+            Solar Panels, Wiring Materials, D Lights, Cameras etc.
 
-=====================================
-PAYMENT SUMMARY
-=====================================
-Total Price: KES ${sale.totalPrice.toLocaleString()}
+┌─────┬──────────────────────────────────────┬──────────┬─────┐
+│ Qty │ Particulars                          │  Kshs.   │ Cts │
+├─────┼──────────────────────────────────────┼──────────┼─────┤
+│  1  │ ${sale.phoneModel.padEnd(36)} │${String(sale.totalPrice).padStart(8)}│     │
+│     │ IMEI: ${sale.imei.padEnd(30)} │          │     │
+│     │ Serial: ${sale.serialNumber.padEnd(26)} │          │     │
+├─────┼──────────────────────────────────────┼──────────┼─────┤
+│     │ TOTAL                                │${String(sale.totalPrice).padStart(8)}│     │
+└─────┴──────────────────────────────────────┴──────────┴─────┘
+
 Down Payment: KES ${sale.downPayment.toLocaleString()}
 Balance: KES ${(sale.totalPrice - sale.downPayment).toLocaleString()}
-Installment Period: ${sale.installmentMonths} months
-Monthly Payment: KES ${Math.round((sale.totalPrice - sale.downPayment) / sale.installmentMonths).toLocaleString()}
+Installment: ${sale.installmentMonths} months @ KES ${monthlyPayment.toLocaleString()}/month
 
-=====================================
-TERMS & CONDITIONS
-=====================================
-✓ Customer has committed to payment plan
-✓ Phone is now property of customer upon down payment
-✓ Monthly payments required on agreed dates
-✓ Default may result in legal action
-
+Receipt ID: ${sale.receiptId}
 Sales Agent: ${sale.agentName}
-Receipt Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+Customer Phone: ${sale.customerPhone}
 
-=====================================
-DAKIRO GENERAL ELECTRONICS
-P.O BOX 46, KERICHO
-Tel: 0720 049 708
-Opposite Kapsoit Guest House
-=====================================
+═══════════════════════════════════════════════════════════════════
+                Goods once sold cannot be re-accepted
+═══════════════════════════════════════════════════════════════════
+
+PAYMENT TERMS:
+• Customer committed to monthly installments
+• Device becomes customer's property upon down payment
+• Payments must be made on agreed dates
+• Default may result in device recovery
+
+Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
     `.trim();
 
     // Create downloadable file
@@ -97,12 +98,12 @@ Opposite Kapsoit Guest House
     element.click();
     document.body.removeChild(element);
 
-    alert(`✅ Receipt downloaded for ${sale.customerName}`);
+    showToast(`Receipt downloaded for ${sale.customerName}`, 'success');
   };
 
   const downloadAllReceipts = () => {
     if (approvedSales.length === 0) {
-      alert('No receipts to download');
+      showToast('No receipts to download', 'info');
       return;
     }
 
@@ -127,7 +128,7 @@ Opposite Kapsoit Guest House
     element.click();
     document.body.removeChild(element);
 
-    alert(`✅ Downloaded ${approvedSales.length} receipts`);
+    showToast(`Downloaded ${approvedSales.length} receipts`, 'success');
   };
 
   if (!isLoaded) {
