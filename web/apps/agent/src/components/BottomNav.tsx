@@ -1,3 +1,7 @@
+'use client';
+
+import { HomeIcon, ShoppingIcon, TrendingIcon, UsersIcon, Icon } from './Icons';
+
 interface BottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -5,10 +9,10 @@ interface BottomNavProps {
 
 export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const tabs = [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'sales', label: 'Sales', icon: '💰' },
-    { id: 'leads', label: 'Leads', icon: '🎯' },
-    { id: 'profile', label: 'Profile', icon: '👤' },
+    { id: 'home', label: 'Home', icon: HomeIcon },
+    { id: 'sales', label: 'Sales', icon: ShoppingIcon },
+    { id: 'leads', label: 'Leads', icon: TrendingIcon },
+    { id: 'profile', label: 'Profile', icon: UsersIcon },
   ];
 
   return (
@@ -24,7 +28,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            <div className="text-2xl mb-1">{tab.icon}</div>
+            <Icon icon={tab.icon} size="md" className="mx-auto mb-1" />
             <div className="text-xs font-medium">{tab.label}</div>
           </button>
         ))}

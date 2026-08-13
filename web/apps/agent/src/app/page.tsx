@@ -1,20 +1,31 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import LoginPage from './login/page';
-import Home from './home/page';
+import type { User } from '@core/types';
 
 export default function Page() {
-  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
-    if (token) {
-      setUser({ name: 'Sales Agent', email: 'agent1@watucredit.co.ke', role: 'agent' });
+    const storedUser = localStorage.getItem('user');
+
+    if (token && storedUser) {
+      try {
+        const userData = JSON.parse(storedUser) as User;
+        setUser(userData);
+        router.push('/home');
+      } catch {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+      }
     }
     setIsLoading(false);
-  }, []);
+  }, [router]);
 
   if (isLoading) {
     return (
@@ -27,9 +38,5 @@ export default function Page() {
     );
   }
 
-  if (!user) {
-    return <LoginPage />;
-  }
-
-  return <Home user={user} setUser={setUser} />;
+  return <LoginPage />;
 }

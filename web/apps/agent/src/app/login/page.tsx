@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { apiClient } from '@core/api';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('agent1@watucredit.co.ke');
   const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
@@ -14,8 +17,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      localStorage.setItem('auth_token', 'mock-token-' + Date.now());
-      window.location.reload();
+      const response = await apiClient.login(email, password);
+      localStorage.setItem('auth_token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      router.push('/home');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
       setLoading(false);
