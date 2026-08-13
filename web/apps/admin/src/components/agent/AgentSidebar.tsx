@@ -10,8 +10,8 @@ export default function AgentSidebar({ activeTab, onTabChange }: AgentSidebarPro
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'stock', label: 'My Stock', icon: '📱' },
     { id: 'customers', label: 'My Customers', icon: '👥' },
-    { id: 'create-sale', label: 'Create Sale', icon: '🛒' },
     { id: 'request-receipt', label: 'Request Receipt', icon: '🧾' },
+    { id: 'commissions', label: 'My Commissions', icon: '💵' },
     { id: 'receipts', label: 'My E-Receipts', icon: '📄' },
     { id: 'payments', label: 'Payments', icon: '💰' },
   ];

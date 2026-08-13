@@ -97,6 +97,26 @@ export default function RequestReceipt() {
       allRequests.unshift(newRequest);
       localStorage.setItem('receiptRequests', JSON.stringify(allRequests));
 
+      // AUTO-ADD CUSTOMER from receipt
+      const newCustomer = {
+        id: `cust-${Date.now()}`,
+        agentId: agentId,
+        name: formData.customerName,
+        phone: formData.customerPhone,
+        email: '',
+        nationalId: '',
+        location: '',
+        nextOfKin: '',
+        status: 'active',
+        createdDate: new Date().toISOString(),
+        receiptRequestId: newRequest.id, // Link to receipt request
+      };
+
+      const customersStored = localStorage.getItem('agentCustomers');
+      const allCustomers = customersStored ? JSON.parse(customersStored) : [];
+      allCustomers.unshift(newCustomer);
+      localStorage.setItem('agentCustomers', JSON.stringify(allCustomers));
+
       // Add notification
       const notif = {
         type: 'receipt_requested',
@@ -112,7 +132,7 @@ export default function RequestReceipt() {
       setShowForm(false);
       setIsLoading(false);
 
-      showToast('Receipt request submitted! Admin will review shortly.', 'success');
+      showToast(`Receipt request submitted and customer "${formData.customerName}" added!`, 'success');
     };
     reader.readAsDataURL(formData.screenshot!);
   };

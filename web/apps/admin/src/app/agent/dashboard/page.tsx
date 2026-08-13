@@ -7,7 +7,7 @@ import AgentTopBar from '../../../components/agent/AgentTopBar';
 import AgentDashboard from '../../../components/agent/AgentDashboard';
 import MyCustomers from '../../../components/agent/MyCustomers';
 import MyStock from '../../../components/agent/MyStock';
-import CreateSale from '../../../components/agent/CreateSale';
+import MyCommissions from '../../../components/agent/MyCommissions';
 import MyReceipts from '../../../components/agent/MyReceipts';
 import RequestReceipt from '../../../components/agent/RequestReceipt';
 import PaymentTracking from '../../../components/agent/PaymentTracking';
@@ -73,8 +73,8 @@ export default function AgentDashboardPage() {
             {activeTab === 'dashboard' && <AgentDashboard />}
             {activeTab === 'customers' && <MyCustomers />}
             {activeTab === 'stock' && <MyStock />}
-            {activeTab === 'create-sale' && <CreateSale />}
             {activeTab === 'request-receipt' && <RequestReceipt />}
+            {activeTab === 'commissions' && <MyCommissions />}
             {activeTab === 'receipts' && <MyReceipts />}
             {activeTab === 'payments' && <PaymentTracking />}
           </div>

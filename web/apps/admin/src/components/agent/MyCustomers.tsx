@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../Modal';
+import { showToast } from '../Toast';
 
 export default function MyCustomers() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -15,9 +17,28 @@ export default function MyCustomers() {
     nextOfKin: '',
   });
 
+  useEffect(() => {
+    loadCustomers();
+  }, []);
+
+  const loadCustomers = () => {
+    const agentId = localStorage.getItem('agent_id');
+    const stored = localStorage.getItem('agentCustomers');
+    if (stored && agentId) {
+      try {
+        const allCustomers = JSON.parse(stored);
+        const agentCustomers = allCustomers.filter((c: any) => c.agentId === agentId);
+        setCustomers(agentCustomers);
+      } catch (e) {
+        console.error('Failed to load customers:', e);
+      }
+    }
+    setIsLoaded(true);
+  };
+
   const handleAddCustomer = () => {
     if (!formData.name || !formData.phone) {
-      alert('Please fill in all required fields');
+      showToast('Please fill in required fields (Name and Phone)', 'error');
       return;
     }
 
@@ -25,13 +46,26 @@ export default function MyCustomers() {
       id: `cust-${Date.now()}`,
       agentId: localStorage.getItem('agent_id'),
       ...formData,
+      status: 'active',
       createdDate: new Date().toISOString(),
     };
 
     setCustomers([newCustomer, ...customers]);
+
+    // Save to localStorage
+    const stored = localStorage.getItem('agentCustomers');
+    const allCustomers = stored ? JSON.parse(stored) : [];
+    allCustomers.unshift(newCustomer);
+    localStorage.setItem('agentCustomers', JSON.stringify(allCustomers));
+
     setFormData({ name: '', phone: '', email: '', nationalId: '', location: '', nextOfKin: '' });
     setShowAddModal(false);
+    showToast('Customer added successfully', 'success');
   };
+
+  if (!isLoaded) {
+    return <div className="text-center py-8">Loading customers...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -39,34 +73,51 @@ export default function MyCustomers() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">👥 My Customers</h1>
-          <p className="text-gray-600 mt-1">Register and manage your customers</p>
+          <p className="text-gray-600 mt-1">Auto-added from receipts + manually registered</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium"
         >
-          + Add Customer
+          + Add Customer Manually
         </button>
+      </div>
+
+      {/* Info Box */}
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3">
+        <p className="text-sm text-blue-800">
+          <strong>ℹ️ Note:</strong> Customers are automatically added when you submit receipt requests. You can also manually add customers here.
+        </p>
       </div>
 
       {/* Customers List */}
       {customers.length === 0 ? (
         <div className="bg-white rounded-lg p-8 text-center">
-          <p className="text-gray-500">No customers added yet. Click "Add Customer" to get started!</p>
+          <p className="text-gray-500">No customers yet. Submit a receipt request to auto-add a customer, or add one manually!</p>
         </div>
       ) : (
         <div className="space-y-3">
           {customers.map((customer) => (
             <div key={customer.id} className="bg-white rounded-lg border border-gray-200 p-4">
               <div className="flex justify-between items-start">
-                <div>
+                <div className="flex-1">
                   <p className="font-semibold text-gray-900">{customer.name}</p>
                   <p className="text-sm text-gray-600">📱 {customer.phone}</p>
-                  <p className="text-sm text-gray-600">📧 {customer.email}</p>
+                  {customer.email && <p className="text-sm text-gray-600">📧 {customer.email}</p>}
+                  {customer.location && <p className="text-sm text-gray-600">📍 {customer.location}</p>}
+                  <p className="text-xs text-gray-500 mt-2">
+                    Added: {new Date(customer.createdDate).toLocaleDateString()}
+                  </p>
                 </div>
-                <button className="px-3 py-1 text-sm bg-primary hover:bg-primary/90 text-white rounded transition">
-                  Create Sale
-                </button>
+                {customer.receiptRequestId ? (
+                  <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                    📄 From Receipt
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
+                    ✎ Manual
+                  </span>
+                )}
               </div>
             </div>
           ))}
