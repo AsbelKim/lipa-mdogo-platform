@@ -10,6 +10,7 @@ import AgentAllocationManager from '../../components/AgentAllocationManager';
 import AgentInventoryDetail from '../../components/AgentInventoryDetail';
 import DevicesList from '../../components/DevicesList';
 import CustomersList from '../../components/CustomersList';
+import SoldPhonesList from '../../components/SoldPhonesList';
 import SalesAnalytics from '../../components/SalesAnalytics';
 import ChatBot from '../../components/ChatBot';
 
@@ -63,6 +64,7 @@ export default function DashboardPage() {
             {activeTab === 'agent-inventory' && <AgentInventoryDetail />}
             {activeTab === 'devices' && <DevicesList />}
             {activeTab === 'customers' && <CustomersList />}
+            {activeTab === 'sold-phones' && <SoldPhonesList />}
             {activeTab === 'sales' && <SalesAnalytics />}
           </div>
         </main>
