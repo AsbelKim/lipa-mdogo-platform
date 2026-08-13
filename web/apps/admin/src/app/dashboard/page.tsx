@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { initializeAdminSampleData } from '../../utils/adminSampleData';
 import Sidebar from '../../components/Sidebar';
 import TopBar from '../../components/TopBar';
 import DashboardContent from '../../components/Dashboard';
@@ -26,6 +27,9 @@ export default function DashboardPage() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // Initialize sample data if needed
+    initializeAdminSampleData();
+
     const token = localStorage.getItem('auth_token');
     if (!token) {
       router.push('/');

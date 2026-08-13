@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { initializeSampleData } from '../../../utils/sampleData';
 import AgentSidebar from '../../../components/agent/AgentSidebar';
 import AgentTopBar from '../../../components/agent/AgentTopBar';
 import AgentDashboard from '../../../components/agent/AgentDashboard';
@@ -20,6 +21,9 @@ export default function AgentDashboardPage() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // Initialize sample data if needed
+    initializeSampleData();
+
     const token = localStorage.getItem('agent_token');
     if (!token) {
       router.push('/agent');
