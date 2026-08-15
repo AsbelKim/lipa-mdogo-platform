@@ -31,6 +31,7 @@ export default function ReceiptRequests() {
   const [approvalComment, setApprovalComment] = useState('');
   const [aiComment, setAiComment] = useState('');
   const [generatingAI, setGeneratingAI] = useState(false);
+  const [showFullscreenScreenshot, setShowFullscreenScreenshot] = useState(false);
 
   useEffect(() => {
     loadRequests();
@@ -324,41 +325,58 @@ Receipt approval confirmed.`,
           }}
           title="Review & Approve Receipt Request"
         >
-          <div className="space-y-4 max-h-[80vh] overflow-y-auto">
-            {/* Request Details */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">📋 Request Details</h3>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-medium">Customer:</span> {selectedRequest.customerName}
-                </p>
-                <p>
-                  <span className="font-medium">Phone:</span> {selectedRequest.customerPhone}
-                </p>
-                <p>
-                  <span className="font-medium">Amount:</span> KES {selectedRequest.amount.toLocaleString()}
-                </p>
-                <p>
-                  <span className="font-medium">Description:</span> {selectedRequest.description}
-                </p>
-                <p>
-                  <span className="font-medium">Agent:</span> {selectedRequest.agentName}
-                </p>
-                <p>
-                  <span className="font-medium">Date:</span>{' '}
-                  {new Date(selectedRequest.createdDate).toLocaleString()}
-                </p>
+          <div className="space-y-4 max-h-[85vh] overflow-y-auto">
+            {/* Screenshot Preview - MAIN FOCUS */}
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border-2 border-blue-300">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold text-gray-900 text-lg">📸 Payment Screenshot</h3>
+                <button
+                  onClick={() => setShowFullscreenScreenshot(true)}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition font-medium"
+                >
+                  🔍 Fullscreen
+                </button>
               </div>
+              <div className="bg-white rounded-lg p-2 border border-gray-200">
+                <img
+                  src={selectedRequest.screenshot}
+                  alt="Receipt screenshot"
+                  className="w-full h-auto rounded cursor-pointer hover:opacity-95 transition"
+                  onClick={() => setShowFullscreenScreenshot(true)}
+                />
+              </div>
+              <p className="text-xs text-gray-600 mt-2">Click image or "Fullscreen" to view in detail</p>
             </div>
 
-            {/* Screenshot Preview */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">📸 Payment Screenshot</h3>
-              <img
-                src={selectedRequest.screenshot}
-                alt="Receipt screenshot"
-                className="max-w-full h-auto border rounded-lg bg-gray-100"
-              />
+            {/* Request Details */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-900 mb-3">📋 Transaction Details</h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-600 text-xs">Customer Name</p>
+                  <p className="font-semibold text-gray-900">{selectedRequest.customerName}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-xs">Phone Number</p>
+                  <p className="font-semibold text-gray-900">{selectedRequest.customerPhone}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-xs">Amount</p>
+                  <p className="font-semibold text-emerald-600 text-lg">KES {selectedRequest.amount.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-xs">Sales Agent</p>
+                  <p className="font-semibold text-gray-900">{selectedRequest.agentName}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-gray-600 text-xs">Service/Description</p>
+                  <p className="font-semibold text-gray-900">{selectedRequest.description}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-gray-600 text-xs">Request Date</p>
+                  <p className="font-semibold text-gray-900">{new Date(selectedRequest.createdDate).toLocaleString()}</p>
+                </div>
+              </div>
             </div>
 
             {/* AI Comment Generation */}
@@ -431,6 +449,49 @@ Receipt approval confirmed.`,
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Fullscreen Screenshot Modal */}
+      {showFullscreenScreenshot && selectedRequest && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto relative">
+            {/* Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center z-10">
+              <div>
+                <h2 className="text-xl font-bold">📸 Payment Screenshot - Fullscreen View</h2>
+                <p className="text-sm text-blue-100 mt-1">Customer: {selectedRequest.customerName} | Amount: KES {selectedRequest.amount.toLocaleString()}</p>
+              </div>
+              <button
+                onClick={() => setShowFullscreenScreenshot(false)}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-medium"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            {/* Screenshot */}
+            <div className="p-4 bg-gray-50">
+              <img
+                src={selectedRequest.screenshot}
+                alt="Receipt screenshot fullscreen"
+                className="w-full h-auto rounded-lg border-4 border-gray-200"
+              />
+              <p className="text-center text-sm text-gray-600 mt-4">
+                ✓ Verify all details match before approving
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="sticky bottom-0 bg-gray-100 p-4 border-t flex gap-2">
+              <button
+                onClick={() => setShowFullscreenScreenshot(false)}
+                className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-bold"
+              >
+                Back to Review
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
