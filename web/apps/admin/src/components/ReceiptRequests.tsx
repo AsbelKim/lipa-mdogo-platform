@@ -98,6 +98,8 @@ Receipt approval confirmed.`,
       const selectedComment = comments[commentIndex];
 
       setAiComment(selectedComment);
+      // Auto-populate approval comment with AI suggestion
+      setApprovalComment(selectedComment);
     } catch (error) {
       console.error('Failed to generate AI comment:', error);
       showToast('Failed to generate AI comment', 'error');
@@ -361,25 +363,27 @@ Receipt approval confirmed.`,
 
             {/* AI Comment Generation */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-300 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-3">
+              <div className="flex justify-between items-center">
                 <div>
                   <h3 className="font-semibold text-gray-900">🤖 AI Receipt Verification</h3>
-                  <p className="text-xs text-gray-600 mt-1">AI will analyze screenshot and generate approval comment</p>
+                  <p className="text-xs text-gray-600 mt-1">Click to generate AI approval suggestion</p>
                 </div>
                 <button
                   onClick={() => generateAIComment(selectedRequest)}
-                  disabled={generatingAI}
+                  disabled={generatingAI || aiComment.length > 0}
                   className={`px-4 py-2 text-white text-sm rounded-lg transition font-medium whitespace-nowrap ${
-                    generatingAI
-                      ? 'bg-gray-400 cursor-wait'
+                    generatingAI || aiComment.length > 0
+                      ? 'bg-gray-400 cursor-default'
                       : 'bg-blue-600 hover:bg-blue-700 active:scale-95'
                   }`}
                 >
                   {generatingAI ? (
                     <>
                       <span className="inline-block animate-spin mr-2">⚙️</span>
-                      Analyzing...
+                      Generating...
                     </>
+                  ) : aiComment.length > 0 ? (
+                    <>✓ Suggested</>
                   ) : (
                     <>✨ Generate with AI</>
                   )}
@@ -387,14 +391,8 @@ Receipt approval confirmed.`,
               </div>
 
               {generatingAI && (
-                <div className="text-sm text-blue-700 bg-white p-3 rounded border border-blue-200 animate-pulse">
+                <div className="text-sm text-blue-700 bg-white p-3 rounded border border-blue-200 animate-pulse mt-3">
                   🔍 AI is analyzing screenshot details, payment method, and transaction validity...
-                </div>
-              )}
-
-              {aiComment && !generatingAI && (
-                <div className="text-sm bg-white p-3 rounded border-l-4 border-green-500 whitespace-pre-line">
-                  <p className="text-gray-700 font-mono">{aiComment}</p>
                 </div>
               )}
             </div>
