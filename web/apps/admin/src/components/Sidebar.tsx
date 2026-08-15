@@ -8,6 +8,8 @@ import {
   TrendingIcon,
 } from './Icons';
 
+import { useEffect, useState } from 'react';
+
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -17,9 +19,20 @@ interface NavTab {
   id: string;
   label: string;
   icon: React.FC;
+  requiresSuperAdmin?: boolean;
 }
 
 export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    const adminData = localStorage.getItem('admin');
+    if (adminData) {
+      const admin = JSON.parse(adminData);
+      setIsSuperAdmin(admin.role === 'super-admin');
+    }
+  }, []);
+
   const tabs: NavTab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
     { id: 'phones', label: 'Available Stock', icon: PhoneIcon },
@@ -33,7 +46,10 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     { id: 'sold-phones', label: 'Sold Phones', icon: ShoppingIcon },
     { id: 'sales', label: 'Sales Analytics', icon: TrendingIcon },
     { id: 'reports', label: 'Reports & Exports', icon: TrendingIcon },
+    { id: 'admin-management', label: 'Admin Management', icon: UsersIcon, requiresSuperAdmin: true },
   ];
+
+  const filteredTabs = tabs.filter(tab => !tab.requiresSuperAdmin || isSuperAdmin);
 
   return (
     <aside className="w-64 bg-gradient-to-b from-watu-dark via-watu-dark to-watu-dark/90 text-white shadow-2xl">
@@ -48,7 +64,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="mt-6 space-y-2 px-3">
-        {tabs.map((tab) => {
+        {filteredTabs.map((tab) => {
           const IconComponent = tab.icon;
           const isActive = activeTab === tab.id;
 

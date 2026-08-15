@@ -18,6 +18,7 @@ import SoldPhonesList from '../../components/SoldPhonesList';
 import SalesAnalytics from '../../components/SalesAnalytics';
 import Reports from '../../components/Reports';
 import AIAgent from '../../components/AIAgent';
+import AdminManagement from '../../components/AdminManagement';
 import { ToastContainer } from '../../components/Toast';
 
 export default function DashboardPage() {
@@ -34,7 +35,14 @@ export default function DashboardPage() {
     if (!token) {
       router.push('/');
     } else {
-      setUser({ name: 'Admin', email: 'admin@watucredit.co.ke', role: 'admin' });
+      // Get logged-in admin info
+      const adminData = localStorage.getItem('admin');
+      if (adminData) {
+        const admin = JSON.parse(adminData);
+        setUser(admin);
+      } else {
+        setUser({ name: 'Admin', email: 'admin@watucredit.co.ke', role: 'admin' });
+      }
 
       // Load tab from localStorage, default to 'dashboard'
       const savedTab = localStorage.getItem('activeTab') || 'dashboard';
@@ -79,6 +87,7 @@ export default function DashboardPage() {
             {activeTab === 'sold-phones' && <SoldPhonesList />}
             {activeTab === 'sales' && <SalesAnalytics />}
             {activeTab === 'reports' && <Reports />}
+            {activeTab === 'admin-management' && <AdminManagement />}
           </div>
         </main>
       </div>

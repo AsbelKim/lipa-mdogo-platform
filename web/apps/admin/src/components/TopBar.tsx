@@ -34,9 +34,9 @@ export default function TopBar({ user, onLogout }: TopBarProps) {
           </button>
 
           <div className="text-right">
-            <p className="text-white text-sm">Welcome, <strong>{user.name}</strong></p>
+            <p className="text-white text-sm">Welcome, <strong>{user.name || 'Admin'}</strong></p>
             <p className="text-white/90 text-xs">
-              {user.role === 'admin' ? 'Administrator' : user.role === 'ops' ? 'Operations' : 'User'} Account
+              {user.role === 'super-admin' ? '👑 Super Admin' : user.role === 'admin' ? '📊 Administrator' : user.role === 'restricted-admin' ? '🔒 Restricted Admin' : 'User'} Account
             </p>
             <button
               onClick={onLogout}
