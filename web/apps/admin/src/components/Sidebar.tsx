@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  userRole?: string;
 }
 
 interface NavTab {
@@ -22,16 +23,20 @@ interface NavTab {
   requiresSuperAdmin?: boolean;
 }
 
-export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+export default function Sidebar({ activeTab, onTabChange, userRole }: SidebarProps) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
-    const adminData = localStorage.getItem('admin');
-    if (adminData) {
-      const admin = JSON.parse(adminData);
-      setIsSuperAdmin(admin.role === 'super-admin');
+    if (userRole === 'super-admin') {
+      setIsSuperAdmin(true);
+    } else {
+      const adminData = localStorage.getItem('admin');
+      if (adminData) {
+        const admin = JSON.parse(adminData);
+        setIsSuperAdmin(admin.role === 'super-admin');
+      }
     }
-  }, []);
+  }, [userRole]);
 
   const tabs: NavTab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
