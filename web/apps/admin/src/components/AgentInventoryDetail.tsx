@@ -82,8 +82,8 @@ export default function AgentInventoryDetail() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">📊 Agent Inventory Detail</h1>
-        <p className="text-gray-600 mt-1">View sold and unsold phones per agent</p>
+        <h1 className="text-3xl font-bold text-gray-900">📊 Allocated Stock</h1>
+        <p className="text-gray-600 mt-1">Phones allocated to sales agents (not yet sold)</p>
       </div>
 
       {/* Agent Selector */}

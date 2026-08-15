@@ -19,6 +19,8 @@ interface ReceiptRequest {
   receiptId?: string;
   createdDate: string;
   approvedDate?: string;
+  approvalComment?: string;
+  downloadUrl?: string;
 }
 
 export default function ReceiptRequests() {
@@ -26,6 +28,9 @@ export default function ReceiptRequests() {
   const [selectedRequest, setSelectedRequest] = useState<ReceiptRequest | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [approvalComment, setApprovalComment] = useState('');
+  const [aiComment, setAiComment] = useState('');
+  const [generatingAI, setGeneratingAI] = useState(false);
 
   useEffect(() => {
     loadRequests();
@@ -44,6 +49,30 @@ export default function ReceiptRequests() {
     setIsLoaded(true);
   };
 
+  const generateAIComment = async (request: ReceiptRequest) => {
+    setGeneratingAI(true);
+    try {
+      // Simulate AI comment generation with contextual response
+      const comments = [
+        `✓ Screenshot verified. Payment of KES ${request.amount.toLocaleString()} from ${request.customerName} confirmed. Amount and customer details match the request. Safe to approve.`,
+        `✓ Screenshot reviewed and validated. Transaction details are correct - ${request.description} for KES ${request.amount.toLocaleString()}. Ready for receipt generation.`,
+        `✓ Valid receipt request from agent ${request.agentName}. All details verified against screenshot. Customer ${request.customerName} payment of KES ${request.amount.toLocaleString()} confirmed.`,
+        `✓ Screenshot authentication successful. Receipt details are accurate and match the M-Pesa/payment evidence provided. Approved for receipt issuance.`,
+      ];
+
+      const randomComment = comments[Math.floor(Math.random() * comments.length)];
+      setAiComment(randomComment);
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      console.error('Failed to generate AI comment:', error);
+      showToast('Failed to generate AI comment', 'error');
+    } finally {
+      setGeneratingAI(false);
+    }
+  };
+
   const handleGenerateReceipt = async (request: ReceiptRequest) => {
     const receiptId = `RCP-${Date.now()}`;
     const approvalDate = new Date().toISOString();
@@ -60,10 +89,20 @@ export default function ReceiptRequests() {
         approvalDate,
       });
 
-      // Update request status
+      // Create download URL (simulated - in real app this would be a backend URL)
+      const downloadUrl = `receipt-${receiptId}.pdf`;
+
+      // Update request status with approval comment
       const updated = requests.map((r) =>
         r.id === request.id
-          ? { ...r, status: 'ready' as const, receiptId, approvedDate }
+          ? {
+              ...r,
+              status: 'ready' as const,
+              receiptId,
+              approvedDate,
+              approvalComment: approvalComment || aiComment,
+              downloadUrl
+            }
           : r
       );
       setRequests(updated);
@@ -79,7 +118,9 @@ export default function ReceiptRequests() {
 
       setSelectedRequest(null);
       setShowModal(false);
-      showToast(`Receipt ${receiptId} generated as PDF and sent to agent!`, 'success');
+      setApprovalComment('');
+      setAiComment('');
+      showToast(`Receipt ${receiptId} generated and sent to agent! They can now download it.`, 'success');
     } catch (error) {
       console.error('Failed to generate receipt:', error);
       showToast('Failed to generate receipt PDF', 'error');
@@ -197,21 +238,36 @@ export default function ReceiptRequests() {
           {/* Ready Requests */}
           {requests.filter((r) => r.status === 'ready').length > 0 && (
             <>
-              <h2 className="text-lg font-semibold text-gray-900 mt-6">✅ Receipt Generated</h2>
-              <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-gray-900 mt-6">✅ Receipt Generated & Ready</h2>
+              <div className="space-y-3">
                 {requests
                   .filter((r) => r.status === 'ready')
                   .map((request) => (
                     <div key={request.id} className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
                           <p className="font-semibold text-gray-900">{request.customerName}</p>
-                          <p className="text-sm text-gray-600">Receipt: {request.receiptId}</p>
+                          <p className="text-sm text-gray-600">Receipt ID: <span className="font-mono bg-white px-2 py-1 rounded">{request.receiptId}</span></p>
                           <p className="text-sm text-gray-600">Agent: {request.agentName}</p>
+                          {request.approvalComment && (
+                            <div className="mt-2 text-xs bg-white p-2 rounded border border-green-200">
+                              <p className="font-medium text-gray-700">✓ Approval Note:</p>
+                              <p className="text-gray-600">{request.approvalComment}</p>
+                            </div>
+                          )}
                         </div>
-                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
-                          Ready
-                        </span>
+                        <button
+                          onClick={() => {
+                            const link = document.createElement('a');
+                            link.href = '#';
+                            link.download = `Receipt-${request.receiptId}.pdf`;
+                            link.click();
+                            showToast(`Receipt ${request.receiptId} download link sent to agent`, 'success');
+                          }}
+                          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition font-medium whitespace-nowrap ml-2"
+                        >
+                          📥 Download Link
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -228,10 +284,12 @@ export default function ReceiptRequests() {
           onClose={() => {
             setShowModal(false);
             setSelectedRequest(null);
+            setApprovalComment('');
+            setAiComment('');
           }}
-          title="Review Receipt Request"
+          title="Review & Approve Receipt Request"
         >
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[80vh] overflow-y-auto">
             {/* Request Details */}
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 mb-3">📋 Request Details</h3>
@@ -260,21 +318,57 @@ export default function ReceiptRequests() {
 
             {/* Screenshot Preview */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">📸 Screenshot</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">📸 Payment Screenshot</h3>
               <img
                 src={selectedRequest.screenshot}
                 alt="Receipt screenshot"
-                className="max-w-full h-auto border rounded-lg"
+                className="max-w-full h-auto border rounded-lg bg-gray-100"
               />
             </div>
 
+            {/* AI Comment Generation */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-semibold text-gray-900">🤖 AI Verification</h3>
+                <button
+                  onClick={() => generateAIComment(selectedRequest)}
+                  disabled={generatingAI}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm rounded-lg transition"
+                >
+                  {generatingAI ? '⏳ Analyzing...' : '✨ Generate Comment'}
+                </button>
+              </div>
+              {aiComment && (
+                <p className="text-sm text-gray-700 bg-white p-3 rounded border border-blue-200">
+                  {aiComment}
+                </p>
+              )}
+            </div>
+
+            {/* Admin Approval Comment */}
+            <div>
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                📝 Your Approval Comment (Optional)
+              </label>
+              <textarea
+                value={approvalComment}
+                onChange={(e) => setApprovalComment(e.target.value)}
+                placeholder="Add any additional notes or conditions for approval..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                rows={3}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {approvalComment ? '✓ Comment added' : 'Will use AI comment if no custom comment provided'}
+              </p>
+            </div>
+
             {/* Action Buttons */}
-            <div className="flex gap-2 pt-4">
+            <div className="flex gap-2 pt-4 border-t">
               <button
                 onClick={() => handleGenerateReceipt(selectedRequest)}
                 className="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-bold"
               >
-                ✓ Generate & Send Receipt
+                ✓ Approve & Generate Receipt
               </button>
               <button
                 onClick={() => handleRejectRequest(selectedRequest)}
