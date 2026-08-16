@@ -6,6 +6,7 @@ import AddLeadModal from './AddLeadModal';
 import CreateSaleModal from './CreateSaleModal';
 import LogPaymentModal from './LogPaymentModal';
 import { Device, Sale, Lead } from '@lipa/core/types';
+import { getAgentSales } from '../utils/sampleData';
 
 interface AgentHomeProps {
   agentId?: string;
@@ -35,20 +36,13 @@ export default function AgentHome({ agentId }: AgentHomeProps) {
           setDevices(assignedDevices);
         }
 
-        // Fetch agent's sales count
+        // Get agent's sales from sample data
         if (agentId) {
-          const salesRes = await fetch(`/api/agents/${agentId}/sales`);
-          if (salesRes.ok) {
-            const salesData = await salesRes.json();
-            setStats((prev) => ({ ...prev, sales: salesData.data?.length || 0 }));
-          }
+          const agentSales = getAgentSales(agentId);
+          setStats((prev) => ({ ...prev, sales: agentSales.length }));
 
-          // Fetch agent's leads count
-          const leadsRes = await fetch(`/api/agents/${agentId}/leads`);
-          if (leadsRes.ok) {
-            const leadsData = await leadsRes.json();
-            setStats((prev) => ({ ...prev, leads: leadsData.data?.length || 0 }));
-          }
+          // Fetch agent's leads count (fallback to 0 for now)
+          setStats((prev) => ({ ...prev, leads: 0 }));
         }
       } catch (err) {
         console.error('Failed to fetch data:', err);

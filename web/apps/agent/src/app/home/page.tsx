@@ -7,6 +7,7 @@ import SalesAssistant from '../../components/SalesAssistant';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@lipa/core/types';
+import { initializeAgentSampleData, getAgentSales } from '../../utils/sampleData';
 
 interface HomeProps {
   user?: User;
@@ -20,6 +21,9 @@ export default function Home({ user: initialUser, setUser }: HomeProps) {
   const [isLoading, setIsLoading] = useState(!initialUser);
 
   useEffect(() => {
+    // Initialize sample data
+    initializeAgentSampleData();
+
     if (!initialUser) {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
