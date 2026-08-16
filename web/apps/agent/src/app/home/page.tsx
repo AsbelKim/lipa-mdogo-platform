@@ -1,6 +1,6 @@
 'use client';
 
-import BottomNav from '../../components/BottomNav';
+import Sidebar from '../../components/Sidebar';
 import AgentHome from '../../components/AgentHome';
 import CommissionDashboard from '../../components/CommissionDashboard';
 import SalesAssistant from '../../components/SalesAssistant';
@@ -63,34 +63,39 @@ export default function Home({ user: initialUser, setUser }: HomeProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-primary text-white p-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">Lipa Mdogo</h1>
-            <p className="text-sm text-emerald-100">{user.name}</p>
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} agentName={user.name} />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col ml-64 overflow-hidden">
+        {/* Top Bar */}
+        <header className="bg-gradient-to-r from-primary to-primary/90 border-b-2 border-primary/20 shadow-lg">
+          <div className="flex items-center justify-between px-8 py-4">
+            <div className="text-white">
+              <h2 className="text-2xl font-bold">Lipa Mdogo</h2>
+              <p className="text-sm text-emerald-100">Sales Agent Portal</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="text-sm bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg transition font-medium"
+            >
+              🚪 Logout
+            </button>
           </div>
-          <button
-            onClick={handleLogout}
-            className="text-sm bg-emerald-700 hover:bg-emerald-800 px-3 py-1 rounded transition"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+        </header>
 
-      {/* Main Content */}
-      <div className="p-4">
-        {activeTab === 'home' && <AgentHome agentId={user.id} />}
-        {activeTab === 'sales' && <SalesTab agentId={user.id} />}
-        {activeTab === 'leads' && <LeadsTab agentId={user.id} />}
-        {activeTab === 'earnings' && <EarningsTab agentId={user.id} />}
-        {activeTab === 'profile' && <ProfileTab user={user} />}
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-8">
+            {activeTab === 'home' && <AgentHome agentId={user.id} />}
+            {activeTab === 'sales' && <SalesTab agentId={user.id} />}
+            {activeTab === 'leads' && <LeadsTab agentId={user.id} />}
+            {activeTab === 'earnings' && <EarningsTab agentId={user.id} />}
+            {activeTab === 'profile' && <ProfileTab user={user} />}
+          </div>
+        </main>
       </div>
-
-      {/* Bottom Navigation */}
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Sales Assistant */}
       <SalesAssistant agentId={user.id} agentName={user.name} />
