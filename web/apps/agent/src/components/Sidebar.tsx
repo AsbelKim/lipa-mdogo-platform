@@ -25,15 +25,33 @@ export default function Sidebar({ activeTab, onTabChange, agentName }: SidebarPr
   return (
     <aside className="w-64 bg-gradient-to-b from-primary to-emerald-700 text-white shadow-2xl h-screen fixed left-0 top-0">
       {/* Header */}
-      <div className="p-6 border-b border-emerald-600/30 bg-gradient-to-r from-primary to-emerald-600">
-        <div className="mb-2">
+      <div className="p-6 border-b border-emerald-600/30 bg-gradient-to-r from-primary to-emerald-600 space-y-3">
+        <div>
           <h1 className="text-3xl font-bold text-white">lipa</h1>
           <p className="text-xs text-emerald-100 font-bold tracking-widest mt-1">AGENT PORTAL</p>
         </div>
+
+        {/* Business Info */}
+        <div className="pt-3 border-t border-emerald-500/30 space-y-1 text-xs">
+          <p className="font-bold text-white">DAKIRO GENERAL ELECTRONICS</p>
+          <p className="text-emerald-100">Opposite Kapsoit Guest House</p>
+          <p className="text-emerald-100">Kapsoit Town</p>
+          <p className="text-emerald-100 font-medium mt-2">
+            📮 P.O BOX 46, KERICHO
+          </p>
+          <p className="text-emerald-100 font-medium">
+            📞 Tel: 0720 049 708
+          </p>
+        </div>
+
+        {/* Agent Name */}
         {agentName && (
-          <p className="text-sm text-emerald-50 mt-3 font-semibold">👤 {agentName}</p>
+          <div className="pt-3 border-t border-emerald-500/30">
+            <p className="text-sm text-emerald-50 font-semibold">👤 {agentName}</p>
+          </div>
         )}
-        <div className="h-1 w-12 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full mt-3"></div>
+
+        <div className="h-1 w-12 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full"></div>
       </div>
 
       {/* Navigation */}
