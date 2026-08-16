@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LoginPage from './login/page';
 import SalesAssistant from '../components/SalesAssistant';
-import type { User } from '@core/types';
+import type { User } from '@lipa/core/types';
 
 export default function Page() {
   const router = useRouter();

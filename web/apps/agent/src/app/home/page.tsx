@@ -6,7 +6,7 @@ import CommissionDashboard from '../../components/CommissionDashboard';
 import SalesAssistant from '../../components/SalesAssistant';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User } from '@core/types';
+import { User } from '@lipa/core/types';
 
 interface HomeProps {
   user?: User;

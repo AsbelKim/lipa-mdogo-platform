@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { deviceApi } from '@core/api';
+import { deviceApi } from '@lipa/core/api';
 
 export async function GET(request: NextRequest) {
   try {

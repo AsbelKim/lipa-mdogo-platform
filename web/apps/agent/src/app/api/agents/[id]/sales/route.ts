@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { saleApi } from '@core/api';
+import { saleApi } from '@lipa/core/api';
 
 export async function GET(
   request: NextRequest,

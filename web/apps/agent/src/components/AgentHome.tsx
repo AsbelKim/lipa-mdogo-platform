@@ -5,7 +5,7 @@ import { PlusIcon, ShoppingIcon, CreditCardIcon, Icon } from './Icons';
 import AddLeadModal from './AddLeadModal';
 import CreateSaleModal from './CreateSaleModal';
 import LogPaymentModal from './LogPaymentModal';
-import { Device, Sale, Lead } from '@core/types';
+import { Device, Sale, Lead } from '@lipa/core/types';
 
 interface AgentHomeProps {
   agentId?: string;

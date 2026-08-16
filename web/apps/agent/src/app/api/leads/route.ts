@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { leadApi } from '@core/api';
+import { leadApi } from '@lipa/core/api';
 
 export async function POST(request: NextRequest) {
   try {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiClient } from '@core/api';
+import { apiClient } from '@lipa/core/api';
 
 export default function LoginPage() {
   const router = useRouter();
