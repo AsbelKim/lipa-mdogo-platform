@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  backend-tests:
+    name: Backend tests & audit
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: lipa_mdogo_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          extensions: sqlite, pdo, pdo_sqlite, pgsql
+
+      - name: Install Composer dependencies
+        working-directory: backend
+        run: composer install --no-progress --no-suggest --prefer-dist
+
+      - name: Run Composer audit (if available)
+        working-directory: backend
+        run: composer audit || true
+
+      - name: Run backend tests
+        working-directory: backend
+        run: composer test --no-interaction --ansi
+
+  web-checks:
+    name: Web lint & audit
+    runs-on: ubuntu-latest
+    needs: backend-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install web dependencies
+        run: |
+          cd web
+          npm ci --no-audit --prefer-offline
+
+      - name: Run npm audit (non-blocking)
+        run: |
+          cd web
+          npm audit --audit-level=moderate || true
+
+      - name: Run web lint/tests (best-effort)
+        run: |
+          cd web
+          npm run lint --if-present || true
+          npm run test --if-present || true
