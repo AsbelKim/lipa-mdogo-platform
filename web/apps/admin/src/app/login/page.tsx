@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { SAMPLE_ADMINS } from '../../types/admins';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('james@watucredit.co.ke');
   const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
@@ -37,7 +39,7 @@ export default function LoginPage() {
         permissions: admin.permissions,
       }));
 
-      window.location.reload();
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
       setLoading(false);
