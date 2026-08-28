@@ -7,15 +7,23 @@ import { validationRules } from '../utils/validationHelpers';
 interface AddDeviceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (device: any) => void;
+  onAdd: (device: {
+    category: 'phone';
+    brand: string;
+    model: string;
+    imei: string;
+    serial_number: string;
+    unit_cost: number;
+  }) => void;
 }
 
 export default function AddDeviceModal({ isOpen, onClose, onAdd }: AddDeviceModalProps) {
   const [formData, setFormData] = useState({
+    brand: 'Samsung',
     model: '',
     imei: '',
-    serialNumber: '',
-    condition: 'new' as 'new' | 'refurbished' | 'used',
+    serial_number: '',
+    unit_cost: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -56,15 +64,13 @@ export default function AddDeviceModal({ isOpen, onClose, onAdd }: AddDeviceModa
     }
 
     // Validate serial number
-    const serialError = validationRules.serialNumber(formData.serialNumber);
+    const serialError = validationRules.serialNumber(formData.serial_number);
     if (serialError) {
-      newErrors.serialNumber = serialError;
+      newErrors.serial_number = serialError;
     }
 
-    // Validate condition
-    const conditionError = validationRules.condition(formData.condition);
-    if (conditionError) {
-      newErrors.condition = conditionError;
+    if (!formData.unit_cost || Number(formData.unit_cost) < 0) {
+      newErrors.unit_cost = 'Unit cost must be zero or greater';
     }
 
     return newErrors;
@@ -80,17 +86,20 @@ export default function AddDeviceModal({ isOpen, onClose, onAdd }: AddDeviceModa
     }
 
     onAdd({
-      ...formData,
-      id: `phone-${Date.now()}`,
-      status: 'in-stock',
-      dateAdded: new Date().toISOString(),
+      category: 'phone',
+      brand: formData.brand,
+      model: formData.model,
+      imei: formData.imei,
+      serial_number: formData.serial_number,
+      unit_cost: Number(formData.unit_cost),
     });
 
     setFormData({
+      brand: 'Samsung',
       model: '',
       imei: '',
-      serialNumber: '',
-      condition: 'new',
+      serial_number: '',
+      unit_cost: '',
     });
     setErrors({});
     onClose();
@@ -99,6 +108,17 @@ export default function AddDeviceModal({ isOpen, onClose, onAdd }: AddDeviceModa
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Add Individual Phone to Inventory">
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Brand *</label>
+          <input
+            type="text"
+            name="brand"
+            value={formData.brand}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Phone Model *
@@ -146,34 +166,31 @@ export default function AddDeviceModal({ isOpen, onClose, onAdd }: AddDeviceModa
           </label>
           <input
             type="text"
-            name="serialNumber"
-            value={formData.serialNumber}
+            name="serial_number"
+            value={formData.serial_number}
             onChange={handleChange}
             placeholder="e.g., RF9DL1A20GU"
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.serialNumber ? 'border-red-500' : 'border-gray-300'
+              errors.serial_number ? 'border-red-500' : 'border-gray-300'
             }`}
           />
-          {errors.serialNumber && <p className="text-red-500 text-xs mt-1">{errors.serialNumber}</p>}
+          {errors.serial_number && <p className="text-red-500 text-xs mt-1">{errors.serial_number}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Condition *
-          </label>
-          <select
-            name="condition"
-            value={formData.condition}
+          <label className="block text-sm font-medium text-gray-700 mb-1">Unit Cost (KES) *</label>
+          <input
+            type="number"
+            name="unit_cost"
+            value={formData.unit_cost}
             onChange={handleChange}
+            min="0"
+            step="0.01"
             className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.condition ? 'border-red-500' : 'border-gray-300'
+              errors.unit_cost ? 'border-red-500' : 'border-gray-300'
             }`}
-          >
-            <option value="new">New</option>
-            <option value="refurbished">Refurbished</option>
-            <option value="used">Used</option>
-          </select>
-          {errors.condition && <p className="text-red-500 text-xs mt-1">{errors.condition}</p>}
+          />
+          {errors.unit_cost && <p className="text-red-500 text-xs mt-1">{errors.unit_cost}</p>}
         </div>
 
         <div className="flex gap-3 pt-4">

@@ -1,23 +1,41 @@
 'use client';
 
+import { useCallback, useState } from 'react';
+import { deviceApi, Device } from '@lipa/core';
+import { useQuery } from '@lipa/core/hooks';
+import AddDeviceModal from './AddDeviceModal';
+import { showToast } from './Toast';
+
 export default function DevicesList() {
-  const devices = [
-    { id: '1', imei: '123456789012345', model: 'Samsung A12', status: 'available', location: 'Nairobi' },
-    { id: '2', imei: '123456789012346', model: 'iPhone 12', status: 'assigned', location: 'Mombasa' },
-    { id: '3', imei: '123456789012347', model: 'Samsung A13', status: 'available', location: 'Kisumu' },
-  ];
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const queryFn = useCallback(() => deviceApi.list(), []);
+  const { data, loading, error, refetch } = useQuery(queryFn);
+  const devices = data?.data ?? [];
+
+  const handleAdd = async (device: Parameters<typeof deviceApi.create>[0]) => {
+    try {
+      await deviceApi.create(device);
+      setIsAddOpen(false);
+      showToast('Device added to inventory', 'success');
+      refetch();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Unable to add device', 'error');
+    }
+  };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Devices</h1>
-        <button className="px-4 py-2 bg-primary hover:bg-emerald-700 text-white rounded-lg transition">
+        <button onClick={() => setIsAddOpen(true)} className="px-4 py-2 bg-primary hover:bg-emerald-700 text-white rounded-lg transition">
           + Add Device
         </button>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
+        {loading && <p className="p-6 text-gray-500">Loading devices...</p>}
+        {error && <p className="p-6 text-red-600">{error}</p>}
+        {!loading && !error && <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">IMEI</th>
@@ -28,14 +46,14 @@ export default function DevicesList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {devices.map((device) => (
+            {devices.map((device: Device) => (
               <tr key={device.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm text-gray-900">{device.imei}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{device.model}</td>
                 <td className="px-6 py-4">
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                      device.status === 'available'
+                      device.status === 'in_stock'
                         ? 'bg-green-100 text-green-800'
                         : device.status === 'assigned'
                         ? 'bg-blue-100 text-blue-800'
@@ -51,9 +69,12 @@ export default function DevicesList() {
                 </td>
               </tr>
             ))}
+            {!devices.length && <tr><td colSpan={5} className="px-6 py-10 text-center text-gray-500">No devices found.</td></tr>}
           </tbody>
         </table>
+        }
       </div>
+      <AddDeviceModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onAdd={handleAdd} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import { Device, PaginatedResponse } from '../types';
+import { CreateDeviceInput, Device, PaginatedResponse } from '../types';
 
 export const deviceApi = {
   list: (page = 1, perPage = 20) =>
@@ -8,7 +8,7 @@ export const deviceApi = {
   get: (id: string) =>
     apiClient.get<Device>(`/devices/${id}`),
 
-  create: (data: Omit<Device, 'id' | 'created_at'>) =>
+  create: (data: CreateDeviceInput) =>
     apiClient.post<Device>('/devices', data),
 
   update: (id: string, data: Partial<Device>) =>
