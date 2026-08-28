@@ -5,7 +5,11 @@ export class ApiClient {
   private client: AxiosInstance;
   private token: string | null = null;
 
-  constructor(baseURL: string = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1') {
+  constructor(
+    baseURL: string = process.env.NEXT_PUBLIC_API_URL ||
+      process.env.REACT_APP_API_URL ||
+      'http://localhost:8000/api/v1'
+  ) {
     this.client = axios.create({
       baseURL,
       headers: {
