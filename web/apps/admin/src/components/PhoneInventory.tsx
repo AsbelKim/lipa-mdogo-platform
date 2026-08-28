@@ -148,9 +148,9 @@ export default function PhoneInventory() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">📱 Phone Inventory</h1>
+          <h1 className="text-3xl font-bold text-gray-900">📱 Available Stock</h1>
           <p className="text-gray-600 mt-1">
-            {viewMode === 'models' ? 'Manage phone models and pricing' : 'Track individual phones with IMEI numbers'}
+            {viewMode === 'models' ? 'Phones not yet allocated to any sales agent' : 'Individual phones ready for agent allocation'}
           </p>
         </div>
         <button className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition">
@@ -178,7 +178,7 @@ export default function PhoneInventory() {
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          📱 Individual Phones ({individualPhones.length})
+          📱 Individual Phones ({individualPhones.filter(p => p.status === 'in-stock').length})
         </button>
       </div>
 
@@ -428,7 +428,7 @@ export default function PhoneInventory() {
       {viewMode === 'individual' && (
         <div className="bg-white rounded-lg shadow p-6">
           <IndividualPhoneList
-            phones={individualPhones}
+            phones={individualPhones.filter(p => p.status === 'in-stock')}
             onDelete={(phoneId) => {
               setIndividualPhones(individualPhones.filter(p => p.id !== phoneId));
             }}

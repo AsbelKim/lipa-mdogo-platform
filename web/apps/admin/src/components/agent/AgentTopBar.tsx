@@ -1,0 +1,35 @@
+'use client';
+
+import { DEALER_CONFIG, DEALER_BRANDING } from '../../config/dealer';
+
+interface AgentTopBarProps {
+  agent: any;
+  onLogout: () => void;
+}
+
+export default function AgentTopBar({ agent, onLogout }: AgentTopBarProps) {
+  return (
+    <header className="bg-gradient-to-r from-primary to-primary/90 border-b-2 border-primary/20 shadow-lg">
+      <div className="flex items-center justify-between px-8 py-4">
+        <div className="flex items-center gap-4">
+          <div className="text-white">
+            <h2 className="text-2xl font-bold">{DEALER_CONFIG.name}</h2>
+            <p className="text-sm text-white/90">{DEALER_BRANDING.headerSubtitle}</p>
+            <p className="text-xs text-white/80 mt-1">{DEALER_BRANDING.contactInfo}</p>
+          </div>
+        </div>
+
+        <div className="text-right">
+          <p className="text-white text-sm">Welcome, <strong>{agent.name}</strong></p>
+          <p className="text-white/90 text-xs">Sales Agent Account</p>
+          <button
+            onClick={onLogout}
+            className="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition font-medium text-sm"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}

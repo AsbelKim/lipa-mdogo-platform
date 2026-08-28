@@ -1,0 +1,31 @@
+#!/bin/sh
+# Simple pre-commit hook to prevent committing common sensitive files or private keys
+# Enable locally with: git config core.hooksPath .githooks
+
+set -e
+
+# List staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | tr '\n' ' ')
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+for f in $STAGED_FILES; do
+  # Check filenames that look sensitive
+  case "$f" in
+    *.pem|*.key|id_rsa|id_dsa|id_ecdsa|*.p12|*.pfx|.env|.env.*)
+      echo "ERROR: Attempt to commit a potentially sensitive file: $f"
+      echo "Either remove it from the commit or add it to .gitignore if appropriate."
+      exit 1
+      ;;
+  esac
+
+  # Check contents for private key headers
+  if git show :"$f" 2>/dev/null | grep -E --silent "-----BEGIN (RSA |)?PRIVATE KEY-----|BEGIN PRIVATE KEY|PRIVATE KEY"; then
+    echo "ERROR: Detected private key content in staged file: $f"
+    exit 1
+  fi
+
+done
+
+exit 0

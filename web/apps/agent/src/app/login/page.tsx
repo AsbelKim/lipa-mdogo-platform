@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { SAMPLE_AGENTS } from '../../types/agents';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('agent1@watucredit.co.ke');
-  const [password, setPassword] = useState('password');
+  const router = useRouter();
+  const [email, setEmail] = useState('kelvin@watucredit.co.ke');
+  const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -14,8 +17,29 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      localStorage.setItem('auth_token', 'mock-token-' + Date.now());
-      window.location.reload();
+      // Find agent by email and password
+      const agent = SAMPLE_AGENTS.find(
+        (a) => a.email === email && a.password === password && a.status === 'active'
+      );
+
+      if (!agent) {
+        setError('Invalid email or password. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Store auth token and agent info
+      localStorage.setItem('auth_token', 'agent-token-' + Date.now());
+      localStorage.setItem('user', JSON.stringify({
+        id: agent.id,
+        name: agent.name,
+        email: agent.email,
+        phone: agent.phone,
+        location: agent.location,
+        region: agent.region,
+      }));
+
+      router.push('/home');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
       setLoading(false);
@@ -27,7 +51,7 @@ export default function LoginPage() {
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Lipa Mdogo</h1>
-          <p className="text-sm text-gray-600 mt-2">Sales Agent App</p>
+          <p className="text-sm text-gray-600 mt-2">Sales Agent Portal</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -39,7 +63,7 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              Email Address
             </label>
             <input
               type="email"
@@ -75,13 +99,34 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-center text-xs text-gray-600">
-            Demo Credentials:
-            <br />
-            agent1@watucredit.co.ke
-            <br />
-            password
-          </p>
+          <p className="text-center text-xs font-semibold text-gray-900 mb-3">Test Agents:</p>
+          <div className="space-y-2 text-xs">
+            <div className="bg-blue-50 p-2 rounded">
+              <p className="font-semibold text-blue-900">👤 Kelvin Kimutai</p>
+              <p className="text-gray-600">kelvin@watucredit.co.ke</p>
+              <p className="text-gray-600">password123</p>
+            </div>
+            <div className="bg-green-50 p-2 rounded">
+              <p className="font-semibold text-green-900">👤 Rose Tata</p>
+              <p className="text-gray-600">rose@watucredit.co.ke</p>
+              <p className="text-gray-600">password123</p>
+            </div>
+            <div className="bg-purple-50 p-2 rounded">
+              <p className="font-semibold text-purple-900">👤 James Mwangi</p>
+              <p className="text-gray-600">james@watucredit.co.ke</p>
+              <p className="text-gray-600">password123</p>
+            </div>
+            <div className="bg-amber-50 p-2 rounded">
+              <p className="font-semibold text-amber-900">👤 Fatima Hassan</p>
+              <p className="text-gray-600">fatima@watucredit.co.ke</p>
+              <p className="text-gray-600">password123</p>
+            </div>
+            <div className="bg-red-50 p-2 rounded">
+              <p className="font-semibold text-red-900">👤 Michael Kipchoge</p>
+              <p className="text-gray-600">michael@watucredit.co.ke</p>
+              <p className="text-gray-600">password123</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

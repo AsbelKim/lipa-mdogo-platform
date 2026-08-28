@@ -1,13 +1,80 @@
 'use client';
 
-export default function AgentHome() {
-  const devices = [
-    { id: '1', model: 'Samsung A12', status: 'available' },
-    { id: '2', model: 'iPhone 12', status: 'available' },
-  ];
+import { useEffect, useState } from 'react';
+import { PlusIcon, ShoppingIcon, CreditCardIcon, Icon } from './Icons';
+import AddLeadModal from './AddLeadModal';
+import CreateSaleModal from './CreateSaleModal';
+import LogPaymentModal from './LogPaymentModal';
+import { Device, Sale, Lead } from '@lipa/core/types';
+import { getAgentSales } from '../utils/sampleData';
+
+interface AgentHomeProps {
+  agentId?: string;
+}
+
+export default function AgentHome({ agentId }: AgentHomeProps) {
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [stats, setStats] = useState({ sales: 0, leads: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [showCreateSaleModal, setShowCreateSaleModal] = useState(false);
+  const [showLogPaymentModal, setShowLogPaymentModal] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch assigned devices
+        const devicesRes = await fetch('/api/devices?status=assigned');
+        if (devicesRes.ok) {
+          const devicesData = await devicesRes.json();
+          const assignedDevices = devicesData.data.filter(
+            (d: Device) => d.assigned_agent_id === agentId
+          );
+          setDevices(assignedDevices);
+        }
+
+        // Get agent's sales from sample data
+        if (agentId) {
+          const agentSales = getAgentSales(agentId);
+          setStats((prev) => ({ ...prev, sales: agentSales.length }));
+
+          // Fetch agent's leads count (fallback to 0 for now)
+          setStats((prev) => ({ ...prev, leads: 0 }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+        setError('Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (agentId) {
+      fetchData();
+    }
+  }, [agentId]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-lg p-4 shadow text-center text-gray-600">
+          Loading dashboard...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
+
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-blue-50 rounded-lg p-3 text-center">
@@ -15,11 +82,11 @@ export default function AgentHome() {
           <p className="text-xs text-gray-600">Devices</p>
         </div>
         <div className="bg-green-50 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-green-600">0</p>
+          <p className="text-2xl font-bold text-green-600">{stats.sales}</p>
           <p className="text-xs text-gray-600">Sales</p>
         </div>
         <div className="bg-amber-50 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-amber-600">0</p>
+          <p className="text-2xl font-bold text-amber-600">{stats.leads}</p>
           <p className="text-xs text-gray-600">Leads</p>
         </div>
       </div>
@@ -28,17 +95,67 @@ export default function AgentHome() {
       <div>
         <h2 className="text-lg font-bold text-gray-900 mb-3">Quick Actions</h2>
         <div className="space-y-2">
-          <button className="w-full bg-primary hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-            ➕ Add Lead
+          <button
+            onClick={() => setShowAddLeadModal(true)}
+            className="w-full bg-primary hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+          >
+            <Icon icon={PlusIcon} size="md" className="text-white" />
+            Add Lead
           </button>
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-            🎁 Create Sale
+          <button
+            onClick={() => setShowCreateSaleModal(true)}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+          >
+            <Icon icon={ShoppingIcon} size="md" className="text-white" />
+            Create Sale
           </button>
-          <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-            💳 Log Payment
+          <button
+            onClick={() => setShowLogPaymentModal(true)}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+          >
+            <Icon icon={CreditCardIcon} size="md" className="text-white" />
+            Log Payment
           </button>
         </div>
       </div>
+
+      {/* Add Lead Modal */}
+      {agentId && (
+        <AddLeadModal
+          isOpen={showAddLeadModal}
+          onClose={() => setShowAddLeadModal(false)}
+          agentId={agentId}
+          onLeadAdded={() => {
+            // Refresh leads count
+            setStats((prev) => ({ ...prev, leads: prev.leads + 1 }));
+          }}
+        />
+      )}
+
+      {/* Create Sale Modal */}
+      {agentId && (
+        <CreateSaleModal
+          isOpen={showCreateSaleModal}
+          onClose={() => setShowCreateSaleModal(false)}
+          agentId={agentId}
+          onSaleCreated={() => {
+            // Refresh sales count
+            setStats((prev) => ({ ...prev, sales: prev.sales + 1 }));
+          }}
+        />
+      )}
+
+      {/* Log Payment Modal */}
+      {agentId && (
+        <LogPaymentModal
+          isOpen={showLogPaymentModal}
+          onClose={() => setShowLogPaymentModal(false)}
+          agentId={agentId}
+          onPaymentLogged={() => {
+            // Payment logged successfully
+          }}
+        />
+      )}
 
       {/* Available Devices */}
       <div>

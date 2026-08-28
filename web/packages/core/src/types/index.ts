@@ -17,12 +17,23 @@ export interface AuthResponse {
 export interface Device {
   id: string;
   imei: string;
+  category: 'phone' | 'solar' | 'radio' | 'tv' | 'other';
+  brand: string;
   model: string;
-  status: 'available' | 'assigned' | 'lost' | 'damaged';
-  assigned_agent_id?: string;
+  specs?: Record<string, unknown> | null;
+  serial_number: string;
+  colour?: string | null;
+  unit_cost: number;
+  status: 'in_stock' | 'assigned' | 'sold' | 'repossessed' | 'lost';
+  current_agent_id?: string | null;
   location?: string;
   created_at: string;
 }
+
+export type CreateDeviceInput = Omit<
+  Device,
+  'id' | 'status' | 'created_at' | 'current_agent_id' | 'location'
+>;
 
 // Customer
 export interface Customer {

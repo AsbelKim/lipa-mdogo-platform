@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { SAMPLE_ADMINS } from '../../types/admins';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@watucredit.co.ke');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('james@watucredit.co.ke');
+  const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -14,8 +15,28 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // For now, mock the login - just store token and reload
-      localStorage.setItem('auth_token', 'mock-token-' + Date.now());
+      // Find admin by email and password
+      const admin = SAMPLE_ADMINS.find(
+        (a) => a.email === email && a.password === password && a.status === 'active'
+      );
+
+      if (!admin) {
+        setError('Invalid email or password. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Store admin info and token
+      localStorage.setItem('auth_token', 'admin-token-' + Date.now());
+      localStorage.setItem('admin', JSON.stringify({
+        id: admin.id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+        department: admin.department,
+        permissions: admin.permissions,
+      }));
+
       window.location.reload();
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
@@ -76,13 +97,24 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-center text-sm text-gray-600">
-            Test Credentials:
-            <br />
-            Email: admin@watucredit.co.ke
-            <br />
-            Password: password
-          </p>
+          <p className="text-center text-sm font-semibold text-gray-900 mb-4">Test Admin Accounts:</p>
+          <div className="space-y-3">
+            <div className="bg-purple-50 p-3 rounded-lg text-sm">
+              <p className="font-semibold text-purple-900">👑 Super Admin</p>
+              <p className="text-xs text-gray-600">james@watucredit.co.ke</p>
+              <p className="text-xs text-gray-600">password123</p>
+            </div>
+            <div className="bg-blue-50 p-3 rounded-lg text-sm">
+              <p className="font-semibold text-blue-900">📊 Admin</p>
+              <p className="text-xs text-gray-600">sarah@watucredit.co.ke</p>
+              <p className="text-xs text-gray-600">password123</p>
+            </div>
+            <div className="bg-amber-50 p-3 rounded-lg text-sm">
+              <p className="font-semibold text-amber-900">🔒 Restricted Admin</p>
+              <p className="text-xs text-gray-600">peter@watucredit.co.ke</p>
+              <p className="text-xs text-gray-600">password123</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

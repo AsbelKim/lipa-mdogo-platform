@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { initializeAdminSampleData } from '../../utils/adminSampleData';
 import Sidebar from '../../components/Sidebar';
 import TopBar from '../../components/TopBar';
 import DashboardContent from '../../components/Dashboard';
@@ -10,12 +11,14 @@ import AgentAllocationManager from '../../components/AgentAllocationManager';
 import AgentInventoryDetail from '../../components/AgentInventoryDetail';
 import DevicesList from '../../components/DevicesList';
 import PendingSales from '../../components/PendingSales';
+import ReceiptRequests from '../../components/ReceiptRequests';
 import AgentSalesSubmission from '../../components/AgentSalesSubmission';
 import CustomersList from '../../components/CustomersList';
 import SoldPhonesList from '../../components/SoldPhonesList';
 import SalesAnalytics from '../../components/SalesAnalytics';
 import Reports from '../../components/Reports';
 import AIAgent from '../../components/AIAgent';
+import AdminManagement from '../../components/AdminManagement';
 import { ToastContainer } from '../../components/Toast';
 
 export default function DashboardPage() {
@@ -25,11 +28,21 @@ export default function DashboardPage() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // Initialize sample data if needed
+    initializeAdminSampleData();
+
     const token = localStorage.getItem('auth_token');
     if (!token) {
       router.push('/');
     } else {
-      setUser({ name: 'Admin', email: 'admin@watucredit.co.ke', role: 'admin' });
+      // Get logged-in admin info
+      const adminData = localStorage.getItem('admin');
+      if (adminData) {
+        const admin = JSON.parse(adminData);
+        setUser(admin);
+      } else {
+        setUser({ name: 'Admin', email: 'admin@watucredit.co.ke', role: 'admin' });
+      }
 
       // Load tab from localStorage, default to 'dashboard'
       const savedTab = localStorage.getItem('activeTab') || 'dashboard';
@@ -55,7 +68,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
+      <Sidebar activeTab={activeTab} onTabChange={handleTabChange} userRole={user?.role} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar user={user} onLogout={handleLogout} />
@@ -68,11 +81,13 @@ export default function DashboardPage() {
             {activeTab === 'agent-inventory' && <AgentInventoryDetail />}
             {activeTab === 'devices' && <DevicesList />}
             {activeTab === 'pending-sales' && <PendingSales />}
+            {activeTab === 'receipt-requests' && <ReceiptRequests />}
             {activeTab === 'agent-receipts' && <AgentSalesSubmission />}
             {activeTab === 'customers' && <CustomersList />}
             {activeTab === 'sold-phones' && <SoldPhonesList />}
             {activeTab === 'sales' && <SalesAnalytics />}
             {activeTab === 'reports' && <Reports />}
+            {activeTab === 'admin-management' && <AdminManagement />}
           </div>
         </main>
       </div>
