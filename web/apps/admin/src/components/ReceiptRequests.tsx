@@ -294,15 +294,25 @@ Receipt approval confirmed.`,
                         </div>
                         <button
                           onClick={() => {
-                            const link = document.createElement('a');
-                            link.href = '#';
-                            link.download = `Receipt-${request.receiptId}.pdf`;
-                            link.click();
-                            showToast(`Receipt ${request.receiptId} download link sent to agent`, 'success');
+                            if (!request.receiptId || !request.approvedDate) {
+                              showToast('Receipt is not ready for download', 'error');
+                              return;
+                            }
+
+                            generateReceiptPDF({
+                              receiptId: request.receiptId,
+                              customerName: request.customerName,
+                              customerPhone: request.customerPhone,
+                              amount: request.amount,
+                              description: request.description,
+                              agentName: request.agentName,
+                              approvalDate: request.approvedDate,
+                            });
+                            showToast(`Receipt ${request.receiptId} downloaded`, 'success');
                           }}
                           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition font-medium whitespace-nowrap ml-2"
                         >
-                          📥 Download Link
+                          📥 Download Receipt
                         </button>
                       </div>
                     </div>
